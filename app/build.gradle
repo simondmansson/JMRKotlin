@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.kalk.jmr"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.1'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-alpha1'
+
+    implementation 'androidx.core:core-ktx:1.0.0-alpha3'
+    implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0-alpha02'
+    implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0-alpha02'
+
+    // Anko Commons
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
+    implementation "org.jetbrains.anko:anko-design:$anko_version" // For SnackBars
+    // Coroutine listeners for Anko Layouts
+    implementation "org.jetbrains.anko:anko-sdk25-coroutines:$anko_version"
+    implementation "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
+
+
+    //Testing
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0-alpha3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha3'
+
+    //UI
+    implementation 'com.google.android.material:material:1.0.0-alpha3'
+
+    //GSON
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    //Spotify
+    implementation project(':spotify-app-remote')
+    implementation 'com.spotify.android:auth:1.0.0-alpha'
+}
