@@ -67,4 +67,7 @@ dependencies {
     //Spotify
     implementation project(':spotify-app-remote')
     implementation 'com.spotify.android:auth:1.0.0-alpha'
+
+    //Google ActivityBroadcast Recognition
+    implementation 'com.google.android.gms:play-services-location:11.8.0'
 }

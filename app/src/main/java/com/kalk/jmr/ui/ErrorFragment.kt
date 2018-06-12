@@ -1,10 +1,11 @@
-package com.kalk.jmr
+package com.kalk.jmr.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.kalk.jmr.R
 
 class ErrorFragment : Fragment() {
     companion object {
