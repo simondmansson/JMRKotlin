@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                 if (intent.action.equals(ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name)) {
                     val confidence = intent.getIntExtra(ActivityBroadcast.ACTIVITY_CONFIDENCE.name, 0);
                     val type = intent.getStringExtra(ActivityBroadcast.DETECTED_ACTIVITY.name)
-                    Log.d(TAG, "received" + type)
+                    Log.i(TAG, "received" + type)
                     toast("detected action $type with confidence $confidence")
                 }
             }
