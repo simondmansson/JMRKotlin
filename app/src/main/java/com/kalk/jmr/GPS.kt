@@ -44,6 +44,10 @@ constructor(private val mContext: Context) : Service(), LocationListener {
 
     }
 
+    fun CurrentLocation(): String {
+        return " Lat ${location?.latitude} Long ${location?.longitude}"
+    }
+
     override fun onLocationChanged(location: Location?) {
         if (location != null) {
             this.location = location
@@ -60,8 +64,8 @@ constructor(private val mContext: Context) : Service(), LocationListener {
 
     companion object {
         private val TAG = GPS::class.java.simpleName
-        private val MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 10 // 10 meters
-        private val MIN_TIME_BW_UPDATES = (1000 * 60 * 1).toLong() // 1 minute
+        private const val MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 10 // 10 meters
+        private const val MIN_TIME_BW_UPDATES = (1000 * 60 * 1).toLong() // 1 minute
     }
 
 }

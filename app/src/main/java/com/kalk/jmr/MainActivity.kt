@@ -22,10 +22,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.kalk.jmr.enums.ActivityBroadcast
-import kotlinx.android.synthetic.main.recommendations_fragment.*
-import org.jetbrains.anko.design.snackbar
 
 
 class MainActivity : AppCompatActivity(), PlayCommands {
@@ -38,6 +37,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     private lateinit var connectionParams: ConnectionParams
     private lateinit var mActivityRecognitionClient: ActivityRecognitionClient
     private lateinit var mBroadcastReceiver: BroadcastReceiver
+    private lateinit var mGPS: GPS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         setupActionBarWithNavController(this, navController)
         setupWithNavController(bottom_nav, navController)
 
-        mActivityRecognitionClient = ActivityRecognition.getClient(this);
-        mActivityRecognitionClient.requestActivityUpdates(30*1000, getActivityDetectionPendingIntent());
+        mActivityRecognitionClient = ActivityRecognition.getClient(this)
+        mActivityRecognitionClient.requestActivityUpdates(30*1000, getActivityDetectionPendingIntent())
     }
 
     override fun onStart() {
@@ -75,6 +75,12 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             }
 
             SpotifyAppRemote.CONNECTOR.connect(this, connectionParams, connectionListener)
+
+            if(!hasPermissions(applicationContext, GPS_PERMISSIONS)) {
+                Log.e(TAG, "no permission");
+                ActivityCompat.requestPermissions(this, GPS_PERMISSIONS,
+                        1337);
+            } else Log.d(TAG, "Permissions previously granted");
 
         }
 
@@ -138,6 +144,17 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         val intent = Intent(this, ActivityRecognitionService::class.java)
         // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
         return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            1337 -> {
+                Log.d(TAG, "Permissions Granted")
+                mGPS = GPS(this)
+                toast(mGPS.CurrentLocation())
+                return
+            }
+        }
     }
 
     companion object {
