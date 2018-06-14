@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.playlist_card_view.view.*
  * @param playlists List of @class Playlist
  * @param listener
  */
-class PlaylistAdapter(private val playlists: List<Playlist>, val listener: (Playlist) -> Unit) :
+class PlaylistAdapter(private var playlists: List<Playlist>, val listener: (Playlist) -> Unit) :
         RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,6 +35,11 @@ class PlaylistAdapter(private val playlists: List<Playlist>, val listener: (Play
             }
 
         }
+    }
+
+    fun updatePlayList(newlists: List<Playlist>) {
+        playlists = newlists
+        notifyDataSetChanged()
     }
 }
 
