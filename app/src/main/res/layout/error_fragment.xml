@@ -9,6 +9,6 @@
         android:id="@+id/error_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        tools:text="Error message here" />
 
 </FrameLayout>
