@@ -38,7 +38,7 @@
         tools:layout="@layout/history_fragment" />
     <fragment
         android:id="@+id/genresFragment"
-        android:name="com.kalk.jmr.ui.genres.GenresFragment"
+        android:name="com.kalk.jmr.ui.recommendations.GenresFragment"
         android:label="genres_fragment"
         tools:layout="@layout/genres_fragment" />
 </navigation>
