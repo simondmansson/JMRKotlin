@@ -2,14 +2,13 @@
     <string name="app_name">JMR</string>
     <string name="recommendations_fragment_text">Will generate recommendation from: Malmö, still, 12:00</string>
     <string name="settings_fragment_text">Choose which context parameters to recommend from:</string>
-    <string name="history_fragment_text">History</string>
     <string name="button_recommend">Generate Recommendation</string>
     <string name="switch_time">Time</string>
     <string name="switch_location">Location</string>
     <string name="switch_activity">Activity</string>
-    <string name="card_placeholder_text">Card text</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="toolbar_genres">Genres</string>
+    <string name="toolbar_settings">Settings</string>
+    <string name="toolbar_recommendations">Recommendations</string>
+    <string name="toolbar_history">History</string>
 
 </resources>
