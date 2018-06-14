@@ -1,22 +1,19 @@
-package com.kalk.jmr.ui.genres
+package com.kalk.jmr.ui.recommendations
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.kalk.jmr.R
+import com.kalk.jmr.R.layout.genre_card_view
 import kotlinx.android.synthetic.main.genre_card_view.view.*
-import kotlinx.android.synthetic.main.genres_fragment.view.*
 
-class GenresAdapter(var genres: List<String>, val listener: (String) -> Unit):
+class GenresAdapter(private var genres: List<String>, private val listener: (String) -> Unit):
         RecyclerView.Adapter<GenresAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val playlist = inflater.inflate(R.layout.genre_card_view, parent, false)
+        val playlist = inflater.inflate(genre_card_view, parent, false)
         return ViewHolder(playlist)
     }
 
