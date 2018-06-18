@@ -1,10 +1,11 @@
 package com.kalk.jmr.ui.recommendations
 
 import android.os.Bundle
-import android.view.*
-import android.widget.Toast
-import androidx.core.widget.toast
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
@@ -39,22 +40,21 @@ class GenresFragment : Fragment() {
         return inflater.inflate(R.layout.genres_fragment, container, false)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return super.onOptionsItemSelected(item)
-
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         recommendations = ViewModelProviders.of(activity!!).get(RecommendationsViewModel::class.java)
 
         adapter = GenresAdapter(genres) {
-            context?.toast("Genre set to ${it}", Toast.LENGTH_SHORT)
             recommendations.setGenre(it)
         }
 
+
         genres_recycler.layoutManager = LinearLayoutManager(view?.context)
         genres_recycler.adapter = adapter
+
+        recommendations.getGenre().observe(this, Observer {
+            genre_current.text = resources.getString(R.string.chosen_genre, it)
+        })
 
     }
 
