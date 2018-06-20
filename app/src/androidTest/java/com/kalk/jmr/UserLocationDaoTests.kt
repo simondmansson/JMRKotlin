@@ -49,4 +49,14 @@ class UserLocationDaoTests {
         assertEquals(queryResult2, null)
     }
 
+    @Test
+    fun finds_userLocation_by_coordinates() {
+        val loc1 = UserLocation(1, Coordinates(1.0, 2.0))
+        dao.addLocation(loc1)
+        val queryResult = dao.inRangeOfCoordinates(0.0, 0.0, 2.0, 2.0)
+        assertEquals(queryResult.id, loc1.id)
+        assertEquals(0, queryResult.coordinates.longitude.compareTo(loc1.coordinates.longitude))
+        assertEquals(0, queryResult.coordinates.latitude.compareTo(loc1.coordinates.latitude))
+    }
+
 }
