@@ -32,4 +32,17 @@ class UserActivityDaoTests {
         assertEquals(queryResult.id, activity.id)
         assertEquals(queryResult.type, activity.type)
     }
+
+    @Test
+    fun will_not_add_activity_if_activity_already_exists() {
+        val activity = UserActivity(1, "Running")
+        val activity2 = UserActivity(2, "Running")
+        dao.addActivity(activity)
+        dao.addActivity(activity2)
+        val queryResult = dao.byId(activity.id)
+        assertEquals(activity.id, queryResult.id)
+        assertEquals(activity.type, queryResult.type)
+        val queryResult2 = dao.byId(activity2.id)
+        assertEquals(null, queryResult2)
+    }
 }
