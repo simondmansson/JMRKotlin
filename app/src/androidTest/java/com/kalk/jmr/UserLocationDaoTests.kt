@@ -35,4 +35,18 @@ class UserLocationDaoTests {
         assertEquals(0, queryResult.coordinates.latitude.compareTo(location.coordinates.latitude))
     }
 
+    @Test
+    fun will_not_add_location_with_same_coordinates_twice_to_db() {
+        val loc1 = UserLocation(1, Coordinates(1.0, 2.0))
+        val loc2 = UserLocation(2, Coordinates(1.0, 2.0))
+        dao.addLocation(loc1)
+        dao.addLocation(loc2)
+        val queryResult = dao.byId(1)
+        assertEquals(queryResult.id, loc1.id)
+        assertEquals(0, queryResult.coordinates.longitude.compareTo(loc1.coordinates.longitude))
+        assertEquals(0, queryResult.coordinates.latitude.compareTo(loc1.coordinates.latitude))
+        val queryResult2 = dao.byId(2)
+        assertEquals(queryResult2, null)
+    }
+
 }
