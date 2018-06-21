@@ -36,7 +36,7 @@ class GenresFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         recommendations = ViewModelProviders.of(this).get(RecommendationsViewModel::class.java)
-        if(recommendations.genres.value!!.isEmpty()) {
+        if(recommendations.genres.value == null) {
             ioThread {
                 recommendations.genres.postValue(AppDatabase.getInstance(activity!!.applicationContext).genreDao().getAllGenres())
             }

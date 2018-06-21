@@ -22,10 +22,14 @@ import com.google.android.gms.location.LocationServices
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.enums.ActivityBroadcast
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
+import com.kalk.jmr.ui.recommendations.Token
 import com.kalk.jmr.ui.settings.SettingsViewModel
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.sdk.android.authentication.AuthenticationClient
+import com.spotify.sdk.android.authentication.AuthenticationRequest
+import com.spotify.sdk.android.authentication.AuthenticationResponse
 import kotlinx.android.synthetic.main.main_activity.*
 import org.jetbrains.anko.toast
 
@@ -73,6 +77,8 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
         preferences = getSharedPreferences("com.kalk.jmr.sharedPreferences", Context.MODE_PRIVATE)
         settings = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
+        recommendations = ViewModelProviders.of(this).get(RecommendationsViewModel::class.java)
+        recommendations.setGenre(preferences.getString(CHOSEN_GENRE, "None"))
         with(settings) {
             activity.value = preferences.getBoolean(SWITCH_ACTIVITY, true)
             location.value = preferences.getBoolean(SWITCH_LOCATION, true)
@@ -90,6 +96,15 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         super.onStart()
 
         if(SpotifyAppRemote.isSpotifyInstalled(applicationContext)) {
+
+            val time = System.currentTimeMillis().minus(recommendations.authToken.value?.timestamp ?: Long.MAX_VALUE)
+            if(time <= 0 ) {
+                val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
+                builder.setScopes(arrayOf("app-remote-control", "user-read-recently-played", "user-read-private", "streaming"))
+                val request = builder.build()
+                AuthenticationClient.openLoginActivity(this, 1442, request)
+
+            }
             //Setup Spotify
             connectionParams = ConnectionParams.Builder(CLIENT_ID)
                     .setRedirectUri(REDIRECT_URI)
@@ -111,8 +126,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             //TODO if not spotify is installed
             //  navController.navigate(R.id.error_fragment)
 
-        recommendations = ViewModelProviders.of(this).get(RecommendationsViewModel::class.java)
-        recommendations.setGenre(preferences.getString(CHOSEN_GENRE, "None"))
+
 
         mBroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -127,27 +141,13 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         LocalBroadcastManager.getInstance(applicationContext)
                 .registerReceiver(mBroadcastReceiver, IntentFilter(ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name))
 
-
-
-        if(!hasPermissions(applicationContext, GPS_PERMISSIONS)) {
-            Log.e(TAG, "no permission")
-            ActivityCompat.requestPermissions(this, GPS_PERMISSIONS,
-                    1337)
-        } else {
-            Log.d(TAG, "Permissions previously granted")
-            if(settings.location.value!!) {
-                mFusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                    toast("long ${it.longitude} untz lat ${it.latitude}")
-                    recommendations.setLocation("long ${it.longitude} untz lat ${it.latitude}")
-                }
-            }
-        }
+        getLatestKnownLocation()
     }
 
     override fun onResume() {
         super.onResume()
-        if(settings.activity.value!!)
-            mActivityRecognitionClient.requestActivityUpdates(30*1000, getActivityDetectionPendingIntent())
+
+        mActivityRecognitionClient.requestActivityUpdates(30*1000, getActivityDetectionPendingIntent())
     }
 
     override fun onPause() {
@@ -160,13 +160,12 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             apply()
         }
 
-        if(settings.activity.value!!)
-            mActivityRecognitionClient.removeActivityUpdates(getActivityDetectionPendingIntent())
+        mActivityRecognitionClient.removeActivityUpdates(getActivityDetectionPendingIntent())
     }
 
     override fun onStop() {
         super.onStop()
-        SpotifyAppRemote.CONNECTOR.disconnect(mSpotifyAppRemote)
+        if (mSpotifyAppRemote.isConnected) { SpotifyAppRemote.CONNECTOR.disconnect(mSpotifyAppRemote) }
         LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(mBroadcastReceiver)
     }
 
@@ -179,7 +178,6 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId) {
             R.id.settingsFragment -> navController.navigate(R.id.settingsFragment)
-            R.id.search -> toast("fuck u")
         }
         return super.onOptionsItemSelected(item)
     }
@@ -201,11 +199,44 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+
+        if (requestCode == 1442) {
+            val response = AuthenticationClient.getResponse(resultCode, intent)
+            when(response.type) {
+                AuthenticationResponse.Type.TOKEN -> {
+                    Log.d(TAG, response.accessToken)
+                    toast(response.accessToken)
+                    recommendations.authToken.value = Token(response.accessToken, System.currentTimeMillis())
+                }
+                AuthenticationResponse.Type.ERROR -> Log.e(TAG, response.error)
+                else -> Log.e(TAG, "Im in else, why?")
+            }
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             1337 -> {
                 Log.d(TAG, "Permissions Granted")
                 return
+            }
+        }
+    }
+
+    fun getLatestKnownLocation() {
+        if(!hasPermissions(this, GPS_PERMISSIONS)) {
+            Log.e(TAG, "no permission")
+            ActivityCompat.requestPermissions(this, GPS_PERMISSIONS,
+                    1337)
+        } else {
+            Log.d(TAG, "Permissions previously granted")
+            if(settings.location.value!!) {
+                mFusedLocationProviderClient.lastLocation.addOnSuccessListener {
+                    toast("long ${it.longitude} untz lat ${it.latitude}")
+                    recommendations.setLocation("long ${it.longitude} untz lat ${it.latitude}")
+                }
             }
         }
     }
