@@ -60,9 +60,7 @@ dependencies {
     // Anko Commons
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
     implementation "org.jetbrains.anko:anko-design:$ankoVersion" // For SnackBars
-
-
-
+    
     kapt "android.arch.persistence.room:compiler:$rootProject.roomVersion"
     implementation "android.arch.lifecycle:extensions:$rootProject.lifecycleVersion"
     implementation "android.arch.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"

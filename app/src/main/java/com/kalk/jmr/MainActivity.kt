@@ -26,7 +26,6 @@ import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import kotlinx.android.synthetic.main.main_activity.*
-import org.jetbrains.anko.design.bottomNavigationView
 import org.jetbrains.anko.toast
 
 
