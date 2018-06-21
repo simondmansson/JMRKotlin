@@ -19,6 +19,7 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.enums.ActivityBroadcast
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
 import com.kalk.jmr.ui.settings.SettingsViewModel
@@ -62,7 +63,13 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         //setupActionBarWithNavController(navController)
         bottom_nav.setupWithNavController(navController)
 
-
+        ioThread {
+            val genredao = AppDatabase.getInstance(applicationContext).genreDao()
+            val list = genredao.getAllGenres()
+            runOnUiThread {
+                toast(list.toString())
+            }
+        }
 
         preferences = getSharedPreferences("com.kalk.jmr.sharedPreferences", Context.MODE_PRIVATE)
         settings = ViewModelProviders.of(this).get(SettingsViewModel::class.java)

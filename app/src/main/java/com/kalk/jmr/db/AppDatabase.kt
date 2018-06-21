@@ -1,9 +1,12 @@
 package com.kalk.jmr.db
 
+import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.content.Context
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.kalk.jmr.db.genre.Genre
 import com.kalk.jmr.db.genre.GenreDao
 import com.kalk.jmr.db.location.UserLocation
@@ -36,15 +39,25 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun playListTracksDao():PlaylistTracksDao
 
     companion object {
-        private var sInstance: AppDatabase? = null
+        @Volatile private var sInstance: AppDatabase? = null
 
-        @Synchronized
         fun getInstance(context: Context): AppDatabase {
-            if(sInstance == null) {
-                sInstance = Room.databaseBuilder(context.applicationContext,
-                        AppDatabase::class.java, AppDatabase::class.java.simpleName).build()
+            return sInstance ?: synchronized(this) {
+                sInstance ?: buildDatabase(context).also { sInstance = it }
             }
-            return sInstance!!
+        }
+
+        private fun buildDatabase(context: Context): AppDatabase {
+            return Room.databaseBuilder(context,
+                    AppDatabase::class.java, "db")
+                    .addCallback(object: RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            val seed = OneTimeWorkRequestBuilder<DatabaseSeedWorker>().build()
+                            WorkManager.getInstance().enqueue(seed)
+                        }
+                    })
+                    .build()
         }
     }
 }
