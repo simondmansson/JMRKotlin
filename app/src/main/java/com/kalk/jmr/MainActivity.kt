@@ -2,17 +2,17 @@ package com.kalk.jmr
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.arch.lifecycle.ViewModelProviders
 import android.content.*
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModelProviders
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.widget.Toolbar
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.gms.location.ActivityRecognition
@@ -25,7 +25,6 @@ import com.kalk.jmr.ui.settings.SettingsViewModel
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
-import kotlinx.android.synthetic.main.main_activity.*
 import org.jetbrains.anko.toast
 
 
@@ -52,7 +51,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         super.onCreate(savedInstanceState)
         //Setup UI
         setContentView(R.layout.main_activity)
-        setSupportActionBar(toolbar_main)
+        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar_main))
         navController = findNavController(R.id.nav_host_fragment)
         setupActionBarWithNavController(this, navController)
         setupWithNavController(bottom_nav, navController)

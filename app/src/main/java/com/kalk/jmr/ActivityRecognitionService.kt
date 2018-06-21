@@ -6,18 +6,12 @@ package com.kalk.jmr
 
 import android.app.IntentService
 import android.content.Intent
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
-
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-
-import android.R.attr.name
-import com.google.android.gms.location.DetectedActivity.*
 import com.kalk.jmr.enums.ActivityBroadcast.*
 import com.kalk.jmr.enums.ValidActivity
-import com.kalk.jmr.enums.ValidActivity.*
 
 /**
  * IntentService for handling incoming intents that are generated as a result of requesting

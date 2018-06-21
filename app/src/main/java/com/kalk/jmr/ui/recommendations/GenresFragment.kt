@@ -1,16 +1,11 @@
 package com.kalk.jmr.ui.recommendations
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.Gson
 import com.kalk.jmr.R
-import kotlinx.android.synthetic.main.genres_fragment.*
 import kotlinx.android.synthetic.main.main_activity.*
 
 class GenresFragment : Fragment() {
@@ -25,24 +20,17 @@ class GenresFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        activity?.toolbar_main_text?.text = resources.getString(R.string.toolbar_genres)
+        toolbar_main_text?.text = resources.getString(R.string.toolbar_genres)
 
-        //Read genres from assets
-        val json = context?.assets?.open(
-                "spotify-genres.json")
-                ?.bufferedReader()?.use {
-                    it.readText()
-        }
-
-        val list = Gson().fromJson<GenresList>(json , GenresList::class.java)
-        genres = list.genres.map { genre -> genre.capitalize() }
 
         return inflater.inflate(R.layout.genres_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        recommendations = ViewModelProviders.of(activity!!).get(RecommendationsViewModel::class.java)
+    }
+        /*
+         recommendations = ViewModelProviders.of(this).get(RecommendationsViewModel::class.java)
 
         adapter = GenresAdapter(genres) {
             recommendations.setGenre(it)
@@ -56,11 +44,13 @@ class GenresFragment : Fragment() {
             genre_current.text = resources.getString(R.string.chosen_genre, it)
         })
 
-    }
-
     private fun filter(text: String) {
         val filtered = genres.filter { it.toLowerCase().contains(text.toLowerCase()) }
         adapter.filterGenres(filtered)
     }
-    
+
+    }
+         */
+
+
 }

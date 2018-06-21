@@ -1,8 +1,8 @@
 package com.kalk.jmr.db.playlistTracks
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.Query
 import com.kalk.jmr.db.track.Track
 
 @Dao

@@ -1,9 +1,9 @@
 package com.kalk.jmr.db.playlist
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.ForeignKey
+import android.arch.persistence.room.Index
+import android.arch.persistence.room.PrimaryKey
 import com.kalk.jmr.db.genre.Genre
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.db.userActivity.UserActivity

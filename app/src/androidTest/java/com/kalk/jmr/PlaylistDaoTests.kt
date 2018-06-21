@@ -1,8 +1,8 @@
 package com.kalk.jmr
 
-import androidx.room.Room
-import androidx.test.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnit4
+import android.arch.persistence.room.Room
+import android.support.test.InstrumentationRegistry
+import android.support.test.runner.AndroidJUnit4
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.playlist.Playlist
 import com.kalk.jmr.db.playlist.PlaylistDao

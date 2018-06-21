@@ -1,10 +1,11 @@
 package com.kalk.jmr.ui.history
 
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import com.kalk.jmr.R
+import com.kalk.jmr.db.playlist.Playlist
 import kotlinx.android.synthetic.main.playlist_card_view.view.*
 
 /**

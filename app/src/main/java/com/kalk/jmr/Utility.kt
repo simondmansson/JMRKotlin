@@ -1,12 +1,12 @@
 package com.kalk.jmr
 
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import android.os.Build
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
-import java.util.*
+import android.content.pm.PackageManager
+import android.os.Build
+import android.support.v4.app.ActivityCompat
+import java.util.concurrent.Executors
 
 
 val GPS_PERMISSIONS = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
@@ -21,4 +21,11 @@ fun hasPermissions(context: Context?, allPermissionNeeded: Array<String>): Boole
             if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED)
                 return false
     return true
+}
+
+
+private val IO_EXECUTOR = Executors.newSingleThreadExecutor()
+
+fun ioThread(f: () -> Unit) {
+    IO_EXECUTOR.execute(f)
 }

@@ -1,13 +1,13 @@
 package com.kalk.jmr.db.genre
 
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Index
+import android.arch.persistence.room.PrimaryKey
 
-@Entity (tableName = "genres",
+@Entity(tableName = "genres",
         indices = [
                 Index(value = ["id"], unique = true),
-                Index(value = ["genre"], unique = true)
+                (Index(value = ["genre"], unique = true))
         ]
 )
 data class Genre(

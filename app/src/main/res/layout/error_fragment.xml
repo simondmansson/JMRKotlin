@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.ErrorFragment">
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/error_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

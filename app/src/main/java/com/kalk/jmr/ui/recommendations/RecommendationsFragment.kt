@@ -1,9 +1,9 @@
 package com.kalk.jmr.ui.recommendations
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +26,7 @@ class RecommendationsFragment() : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
-        activity?.toolbar_main_text?.text = "Recommendations"
+        toolbar_main_text?.text = "Recommendations"
 
         val view = inflater.inflate(R.layout.recommendations_fragment, container, false)
 

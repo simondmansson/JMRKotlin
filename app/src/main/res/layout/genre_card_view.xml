@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.google.android.material.card.MaterialCardView
+    <android.support.design.card.MaterialCardView
         style="@style/Widget.MaterialComponents.CardView"
         android:id="@+id/genre_card"
         android:layout_width="match_parent"
@@ -18,17 +18,17 @@
         app:cardBackgroundColor="@color/colorPrimary">
 
         <!-- Card contents. -->
-        <androidx.appcompat.widget.AppCompatTextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/genre_card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/fab_margin"
-            tools:text="GenreTEXThere"
+            tools:text="Genre text here"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             android:textColor="@color/white"
             android:textAlignment="center"
             android:paddingTop="@dimen/start_padding"/>
 
-    </com.google.android.material.card.MaterialCardView>
+    </android.support.design.card.MaterialCardView>
 
 </LinearLayout>

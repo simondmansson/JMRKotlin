@@ -1,6 +1,6 @@
 package com.kalk.jmr.ui.recommendations
 
-import androidx.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModel
 
 class RecommendationsViewModel : ViewModel() {
     // TODO: Implement the ViewModel

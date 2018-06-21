@@ -3,10 +3,7 @@ package com.kalk.jmr.ui.recommendations
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.kalk.jmr.R
 import com.kalk.jmr.R.layout.genre_card_view
-import kotlinx.android.synthetic.main.genre_card_view.view.*
 
 class GenresAdapter(private var genres: List<String>, private val listener: (String) -> Unit):
         RecyclerView.Adapter<GenresAdapter.ViewHolder>() {

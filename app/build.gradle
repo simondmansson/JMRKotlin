@@ -1,73 +1,85 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.compileSdkVersion
+    dataBinding {
+        enabled = true
+    }
     defaultConfig {
         applicationId "com.kalk.jmr"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName "0.1.3"
+        vectorDrawables.useSupportLibrary true
     }
     buildTypes {
+        debug {
+            // Temporary workaround for Kotlin 1.2.50 and DataBinding bug. For more context see
+            // https://issuetracker.google.com/issues/110198434 and
+            // https://youtrack.jetbrains.com/issue/KT-24915#comment=27-2914947
+            tasks.whenTaskAdded { task ->
+                if (task.name == 'kaptDebugKotlin') {
+                    task.dependsOn dataBindingExportFeaturePackageIdsDebug
+                }
+            }
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            // Temporary workaround for Kotlin 1.2.50 and DataBinding bug. For more context see
+            // https://issuetracker.google.com/issues/110198434 and
+            // https://youtrack.jetbrains.com/issue/KT-24915#comment=27-2914947
+            tasks.whenTaskAdded { task ->
+                if (task.name == 'kaptReleaseKotlin') {
+                    task.dependsOn dataBindingExportFeaturePackageIdsRelease
+                }
+            }
         }
     }
-}
-
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
-
-kotlin {
-    experimental {
-        coroutines "enable"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.1'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0-alpha1'
-
-    implementation 'androidx.core:core-ktx:1.0.0-alpha3'
-    implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0-alpha02'
-    implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0-alpha02'
-
-    // Anko Commons
-    implementation "org.jetbrains.anko:anko-commons:$anko_version"
-    implementation "org.jetbrains.anko:anko-design:$anko_version" // For SnackBars
-    // Coroutine listeners for Anko Layouts
-    implementation "org.jetbrains.anko:anko-sdk25-coroutines:$anko_version"
-    implementation "org.jetbrains.anko:anko-appcompat-v7-coroutines:$anko_version"
-
-
-    //Testing
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0-alpha3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha3'
-
-    //UI
-    implementation 'com.google.android.material:material:1.0.0-alpha3'
-
-    //GSON
-    implementation 'com.google.code.gson:gson:2.8.5'
-
     //Spotify
     implementation project(':spotify-app-remote')
-    implementation 'com.spotify.android:auth:1.0.0-alpha'
+    implementation "com.spotify.android:auth:$rootProject.spotifyAuthVersion"
 
     //Google ActivityBroadcast Recognition
-    implementation 'com.google.android.gms:play-services-location:11.8.0'
+    implementation "com.google.android.gms:play-services-location:$rootProject.googlePlaySerivceLocationVersion"
+
+    // Anko Commons
+    implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
+    implementation "org.jetbrains.anko:anko-design:$ankoVersion" // For SnackBars
+
+
+
+    kapt "android.arch.persistence.room:compiler:$rootProject.roomVersion"
+    implementation "android.arch.lifecycle:extensions:$rootProject.lifecycleVersion"
+    implementation "android.arch.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
+    implementation "android.arch.navigation:navigation-ui-ktx:$rootProject.navigationVersion"
+    implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
+    implementation "android.arch.work:work-runtime-ktx:$rootProject.workVersion"
+    implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
+    implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    implementation "com.android.support.constraint:constraint-layout:$rootProject.constraintLayoutVersion"
+    implementation "com.android.support:design:$rootProject.supportLibraryVersion"
+    implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$rootProject.kotlinVersion"
+
+    // Testing dependencies
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
+    testImplementation "junit:junit:$rootProject.junitVersion"
 }
