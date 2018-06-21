@@ -1,11 +1,11 @@
 package com.kalk.jmr.ui.settings
 
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import com.kalk.jmr.R
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.settings_fragment.*
@@ -21,7 +21,7 @@ class SettingsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        activity?.toolbar_main_text?.text = resources.getString(R.string.toolbar_settings)
+        toolbar_main_text?.text = resources.getString(R.string.toolbar_settings)
 
         return inflater.inflate(R.layout.settings_fragment, container, false)
     }
