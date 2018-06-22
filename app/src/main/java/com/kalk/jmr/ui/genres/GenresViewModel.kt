@@ -1,4 +1,4 @@
-package com.kalk.jmr.ui.recommendations
+package com.kalk.jmr.ui.genres
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData

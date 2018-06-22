@@ -1,4 +1,4 @@
-package com.kalk.jmr.ui.recommendations
+package com.kalk.jmr.ui.genres
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.kalk.jmr.R
-import com.kalk.jmr.db.genre.Genre
 import com.kalk.jmr.getGenreRepository
 import kotlinx.android.synthetic.main.genres_fragment.*
 import kotlinx.android.synthetic.main.main_activity.*

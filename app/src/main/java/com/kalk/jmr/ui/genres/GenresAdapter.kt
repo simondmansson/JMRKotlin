@@ -1,4 +1,4 @@
-package com.kalk.jmr.ui.recommendations
+package com.kalk.jmr.ui.genres
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
