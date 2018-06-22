@@ -67,14 +67,6 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         //setupActionBarWithNavController(navController)
         bottom_nav.setupWithNavController(navController)
 
-        ioThread {
-            val genredao = AppDatabase.getInstance(applicationContext).genreDao()
-            val list = genredao.getAllGenres()
-            runOnUiThread {
-                toast(list.toString())
-            }
-        }
-
         preferences = getSharedPreferences("com.kalk.jmr.sharedPreferences", Context.MODE_PRIVATE)
         settings = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
         recommendations = ViewModelProviders.of(this).get(RecommendationsViewModel::class.java)
@@ -133,7 +125,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                 if (intent.action == ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name) {
                     val confidence = intent.getIntExtra(ActivityBroadcast.ACTIVITY_CONFIDENCE.name, 0)
                     val type = intent.getStringExtra(ActivityBroadcast.DETECTED_ACTIVITY.name)
-                    Log.i(TAG, "recived $type with confidence $confidence")
+                    Log.i(TAG, "received $type with confidence $confidence")
                     recommendations.setActivity(type)
                 }
             }

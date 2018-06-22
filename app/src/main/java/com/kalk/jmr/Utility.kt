@@ -23,7 +23,6 @@ fun hasPermissions(context: Context?, allPermissionNeeded: Array<String>): Boole
     return true
 }
 
-
 private val IO_EXECUTOR = Executors.newSingleThreadExecutor()
 
 fun ioThread(f: () -> Unit) {

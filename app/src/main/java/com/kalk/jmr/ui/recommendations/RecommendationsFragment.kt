@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
+import com.kalk.jmr.db.genre.GenreDao
+import com.kalk.jmr.db.genre.GenreRepository
 import com.kalk.jmr.ui.settings.SettingsViewModel
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.recommendations_fragment.*
@@ -26,6 +28,7 @@ class RecommendationsFragment() : Fragment() {
     private lateinit var recommendations: RecommendationsViewModel
     private lateinit var settings: SettingsViewModel
     private lateinit var songList:List<String>
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

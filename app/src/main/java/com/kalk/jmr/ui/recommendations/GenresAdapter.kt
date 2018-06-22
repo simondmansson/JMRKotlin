@@ -8,7 +8,7 @@ import com.kalk.jmr.R.layout.genre_card_view
 import com.kalk.jmr.db.genre.Genre
 import kotlinx.android.synthetic.main.genre_card_view.view.*
 
-class GenresAdapter(var genres: List<Genre>, private val listener: (String) -> Unit):
+class GenresAdapter(private var genres: List<Genre>, private val listener: (String) -> Unit):
         RecyclerView.Adapter<GenresAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,5 +31,10 @@ class GenresAdapter(var genres: List<Genre>, private val listener: (String) -> U
                 view ->  listener.invoke(genre.id.toString())
             }
         }
+    }
+
+    fun updateGenres(genres:List<Genre>) {
+        this.genres = genres
+        notifyDataSetChanged()
     }
 }
