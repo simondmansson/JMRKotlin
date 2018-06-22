@@ -10,6 +10,7 @@ buildscript {
 
         // App dependencies
         ankoVersion = '0.10.5'
+        archTestVersion = '1.1.1'
         constraintLayoutVersion = '1.1.2'
         dataBindingVersion = '3.0.1'
         espressoVersion = '3.0.1'
