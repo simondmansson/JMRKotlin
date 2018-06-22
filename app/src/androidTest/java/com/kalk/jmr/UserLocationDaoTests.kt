@@ -1,16 +1,18 @@
 package com.kalk.jmr
 
+import android.arch.persistence.room.Room
+import android.support.test.InstrumentationRegistry
+import android.support.test.runner.AndroidJUnit4
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.location.Coordinates
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.db.location.UserLocationDao
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+
 @RunWith(AndroidJUnit4::class)
 class UserLocationDaoTests {
     private lateinit var db: AppDatabase
@@ -22,6 +24,11 @@ class UserLocationDaoTests {
                 .allowMainThreadQueries()
                 .build()
         dao = db.locationDao()
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test

@@ -1,10 +1,11 @@
 package com.kalk.jmr
+import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import android.arch.persistence.room.Room
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.genre.Genre
 import com.kalk.jmr.db.genre.GenreDao
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
@@ -22,6 +23,11 @@ class GenreDaoTest {
                 .allowMainThreadQueries()
                 .build()
         dao = db.genreDao()
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test

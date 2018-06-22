@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.playlist.Playlist
 import com.kalk.jmr.db.playlist.PlaylistDao
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +29,11 @@ class PlaylistDaoTests {
                 .allowMainThreadQueries()
                 .build()
         dao = db.playlistDao()
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test
