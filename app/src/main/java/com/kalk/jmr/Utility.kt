@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.app.ActivityCompat
 import com.kalk.jmr.db.AppDatabase
+import com.kalk.jmr.db.RecommendationsRepository
 import com.kalk.jmr.db.genre.GenreRepository
 import java.util.concurrent.Executors
 
@@ -33,4 +34,9 @@ fun ioThread(f: () -> Unit) {
 
 fun getGenreRepository(context: Context): GenreRepository {
     return  GenreRepository.getInstance(AppDatabase.getInstance(context).genreDao())
+}
+
+fun getRecommendationsRepository(context: Context): RecommendationsRepository {
+        val db =  AppDatabase.getInstance(context)
+    return  RecommendationsRepository.getInstance()
 }

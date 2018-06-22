@@ -5,7 +5,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.kalk.jmr.db.genre.Genre
 import com.kalk.jmr.db.genre.GenreDao
 import com.kalk.jmr.db.genre.GenreRepository
-import com.kalk.jmr.ui.recommendations.GenresViewModel
+import com.kalk.jmr.ui.genres.GenresViewModel
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test

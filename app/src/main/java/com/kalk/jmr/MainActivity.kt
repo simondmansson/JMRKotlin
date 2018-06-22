@@ -13,17 +13,16 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.enums.ActivityBroadcast
-import com.kalk.jmr.ui.recommendations.GenresViewModel
-import com.kalk.jmr.ui.recommendations.GenresViewModelFactory
+import com.kalk.jmr.ui.genres.GenresViewModel
+import com.kalk.jmr.ui.genres.GenresViewModelFactory
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
+import com.kalk.jmr.ui.recommendations.RecommendationsViewModelFactory
 import com.kalk.jmr.ui.recommendations.Token
 import com.kalk.jmr.ui.settings.SettingsViewModel
 import com.spotify.android.appremote.api.ConnectionParams
@@ -53,8 +52,8 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     private lateinit var mBroadcastReceiver: BroadcastReceiver
     private lateinit var preferences: SharedPreferences
     private lateinit var settings: SettingsViewModel
-    private lateinit var recommendations: RecommendationsViewModel
-    private lateinit var genreViewModel:GenresViewModel
+    private lateinit var recommendationsViewModel: RecommendationsViewModel
+    private lateinit var genreViewModel: GenresViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,9 +71,16 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
         preferences = getSharedPreferences("com.kalk.jmr.sharedPreferences", Context.MODE_PRIVATE)
         settings = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
-        recommendations = ViewModelProviders.of(this).get(RecommendationsViewModel::class.java)
-        val factory = GenresViewModelFactory(getGenreRepository(applicationContext))
-        genreViewModel = ViewModelProviders.of(this, factory).get(GenresViewModel::class.java)
+
+        recommendationsViewModel = ViewModelProviders.of(this,
+                RecommendationsViewModelFactory(
+                        getRecommendationsRepository(applicationContext)))
+                            .get(RecommendationsViewModel::class.java)
+
+        genreViewModel = ViewModelProviders.of(this,
+                GenresViewModelFactory(
+                        getGenreRepository(applicationContext)))
+                            .get(GenresViewModel::class.java)
 
         genreViewModel.chosenGenre.value = preferences.getInt(CHOSEN_GENRE, 0)
         toast(genreViewModel.genreText.value?: genreViewModel.chosenGenre.value.toString() )
@@ -97,7 +103,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
         if(SpotifyAppRemote.isSpotifyInstalled(applicationContext)) {
 
-            val time = System.currentTimeMillis().minus(recommendations.authToken.value?.timestamp ?: Long.MAX_VALUE)
+            val time = System.currentTimeMillis().minus(recommendationsViewModel.authToken.value?.timestamp ?: Long.MAX_VALUE)
             if(time <= 0 ) {
                 val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
                 builder.setScopes(arrayOf("app-remote-control", "user-read-recently-played", "user-read-private", "streaming"))
@@ -134,7 +140,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                     val confidence = intent.getIntExtra(ActivityBroadcast.ACTIVITY_CONFIDENCE.name, 0)
                     val type = intent.getStringExtra(ActivityBroadcast.DETECTED_ACTIVITY.name)
                     Log.i(TAG, "received $type with confidence $confidence")
-                    recommendations.setActivity(type)
+                    recommendationsViewModel.setActivity(type)
                 }
             }
         }
@@ -208,7 +214,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                 AuthenticationResponse.Type.TOKEN -> {
                     Log.d(TAG, response.accessToken)
                     toast(response.accessToken)
-                    recommendations.authToken.value = Token(response.accessToken, System.currentTimeMillis())
+                    recommendationsViewModel.authToken.value = Token(response.accessToken, System.currentTimeMillis())
                 }
                 AuthenticationResponse.Type.ERROR -> Log.e(TAG, response.error)
                 else -> Log.e(TAG, "Im in else, why?")
@@ -235,7 +241,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             if(settings.location.value!!) {
                 mFusedLocationProviderClient.lastLocation.addOnSuccessListener {
                     toast("long ${it.longitude} untz lat ${it.latitude}")
-                    recommendations.setLocation("long ${it.longitude} untz lat ${it.latitude}")
+                    recommendationsViewModel.setLocation("long ${it.longitude} untz lat ${it.latitude}")
                 }
             }
         }
