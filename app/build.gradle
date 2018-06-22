@@ -80,5 +80,6 @@ dependencies {
     androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
     testImplementation "junit:junit:$rootProject.junitVersion"
+    testImplementation "android.arch.core:core-testing:$rootProject.archTestVersion"
     androidTestImplementation "org.mockito:mockito-android:$rootProject.mockitoVersion"
 }
