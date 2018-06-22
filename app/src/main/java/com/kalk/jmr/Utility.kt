@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.app.ActivityCompat
+import com.kalk.jmr.db.AppDatabase
+import com.kalk.jmr.db.genre.GenreRepository
 import java.util.concurrent.Executors
 
 
@@ -27,4 +29,8 @@ private val IO_EXECUTOR = Executors.newSingleThreadExecutor()
 
 fun ioThread(f: () -> Unit) {
     IO_EXECUTOR.execute(f)
+}
+
+fun getGenreRepository(context: Context): GenreRepository {
+    return  GenreRepository.getInstance(AppDatabase.getInstance(context).genreDao())
 }
