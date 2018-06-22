@@ -22,6 +22,7 @@ buildscript {
         navigationVersion = '1.0.0-alpha02'
         kotlinVersion = '1.2.50'
         ktxVersion = '0.3'
+        mockitoVersion = '2.15.0'
         roomVersion = '1.1.0'
         runnerVersion = '1.0.1'
         supportLibraryVersion = '28.0.0-alpha3'
