@@ -13,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
@@ -59,14 +60,9 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         super.onCreate(savedInstanceState)
         //Setup UI
         setContentView(R.layout.main_activity)
-        //setSupportActionBar(toolbar_main)
-        //navController = findNavController(R.id.nav_host_fragment)
-        //setupActionBarWithNavController(navController)
-        //bottomNavigationView.setupWithNavController(navController)
-        //setupWithNavController(, navController)
-
-        val navController = findNavController(R.id.nav_host_fragment)
-        //setupActionBarWithNavController(navController)
+        setSupportActionBar(toolbar_main)
+        navController = findNavController(R.id.nav_host_fragment)
+        setupActionBarWithNavController(navController)
         bottom_nav.setupWithNavController(navController)
 
         preferences = getSharedPreferences("com.kalk.jmr.sharedPreferences", Context.MODE_PRIVATE)
