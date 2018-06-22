@@ -14,12 +14,17 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" >
-    <android.support.v7.widget.AppCompatTextView
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
+        <android.support.v7.widget.AppCompatTextView
         android:id="@+id/toolbar_main_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text=""
+        tools:text="Hello"
+        android:textColor="@color/white"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
         />
     </android.support.v7.widget.Toolbar>
@@ -29,16 +34,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add_white_24dp"
-        android:visibility="gone"
-        app:layout_scrollFlags="scroll|enterAlways" />
 
     <fragment
         android:id="@+id/nav_host_fragment"
