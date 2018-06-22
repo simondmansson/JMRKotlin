@@ -7,7 +7,7 @@ import com.kalk.jmr.db.genre.Genre
 
 class RecommendationsViewModel : ViewModel() {
     private val songs: MutableLiveData<List<String>> = MutableLiveData()
-    private val chosenGenre: MutableLiveData<String> = MutableLiveData()
+
     private val currentActivity: MutableLiveData<String> = MutableLiveData()
     private val currentLocation: MutableLiveData<String> = MutableLiveData()
     val authToken: MutableLiveData<Token> = MutableLiveData()
@@ -19,8 +19,7 @@ class RecommendationsViewModel : ViewModel() {
         return songs
     }
 
-    fun setGenre(genre: String) { chosenGenre.value = genre }
-    fun getGenre(): LiveData<String> { return chosenGenre }
+
 
     fun setActivity(current: String) { currentActivity.value = current }
     fun getCurrentActivity(): LiveData<String> { return currentActivity }

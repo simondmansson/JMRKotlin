@@ -21,6 +21,8 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.enums.ActivityBroadcast
+import com.kalk.jmr.ui.recommendations.GenresViewModel
+import com.kalk.jmr.ui.recommendations.GenresViewModelFactory
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
 import com.kalk.jmr.ui.recommendations.Token
 import com.kalk.jmr.ui.settings.SettingsViewModel
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     private lateinit var preferences: SharedPreferences
     private lateinit var settings: SettingsViewModel
     private lateinit var recommendations: RecommendationsViewModel
+    private lateinit var genreViewModel:GenresViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +73,12 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         preferences = getSharedPreferences("com.kalk.jmr.sharedPreferences", Context.MODE_PRIVATE)
         settings = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
         recommendations = ViewModelProviders.of(this).get(RecommendationsViewModel::class.java)
-        recommendations.setGenre(preferences.getString(CHOSEN_GENRE, "None"))
+        val factory = GenresViewModelFactory(getGenreRepository(applicationContext))
+        genreViewModel = ViewModelProviders.of(this, factory).get(GenresViewModel::class.java)
+
+        genreViewModel.chosenGenre.value = preferences.getInt(CHOSEN_GENRE, 0)
+        toast(genreViewModel.genreText.value?: genreViewModel.chosenGenre.value.toString() )
+
         with(settings) {
             activity.value = preferences.getBoolean(SWITCH_ACTIVITY, true)
             location.value = preferences.getBoolean(SWITCH_LOCATION, true)
@@ -148,7 +156,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             putBoolean(SWITCH_ACTIVITY, settings.activity.value ?: true)
             putBoolean(SWITCH_LOCATION, settings.location.value ?: true)
             putBoolean(SWITCH_TIME, settings.time.value ?: true)
-            putString(CHOSEN_GENRE, recommendations.getGenre().value ?: "None")
+            putInt(CHOSEN_GENRE, genreViewModel.chosenGenre.value ?: 0)
             apply()
         }
 

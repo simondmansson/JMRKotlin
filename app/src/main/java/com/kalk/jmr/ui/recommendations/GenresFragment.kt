@@ -16,7 +16,6 @@ import kotlinx.android.synthetic.main.main_activity.*
 import org.jetbrains.anko.toast
 
 class GenresFragment : Fragment() {
-    private lateinit var genres:List<Genre>
     private lateinit var adapter: GenresAdapter
     private lateinit var genreViewModel: GenresViewModel
 
@@ -35,17 +34,21 @@ class GenresFragment : Fragment() {
         val factory = GenresViewModelFactory(getGenreRepository(activity!!.applicationContext))
         genreViewModel = ViewModelProviders.of(activity!!, factory).get(GenresViewModel::class.java)
 
-        adapter = GenresAdapter(listOf()) { genreViewModel.setGenre(it.toInt()) }
+        adapter = GenresAdapter(listOf()) {
+            genreViewModel.chosenGenre.value = it.toInt()
+            context?.toast("${genreViewModel.genreText.value} chosen")
+        }
 
         genreViewModel.genres.observe( this, Observer { adapter.updateGenres(it ?: listOf()) })
+
         genreViewModel.genreText.observe( this, Observer {
             genre_current.text = resources.getString(R.string.chosen_genre, it)
-            context?.toast("$it chosen")
+
         })
 
         genres_recycler.layoutManager = LinearLayoutManager(view?.context)
         genres_recycler.adapter = adapter
-        genre_current.text = resources.getString(R.string.chosen_genre, genreViewModel.genreText.value ?: "none")
+        genre_current.text = resources.getString(R.string.chosen_genre, genreViewModel.genreText.value)
 
     }
 }

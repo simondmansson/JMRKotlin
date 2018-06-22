@@ -10,8 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
-import com.kalk.jmr.db.genre.GenreDao
-import com.kalk.jmr.db.genre.GenreRepository
+import com.kalk.jmr.getGenreRepository
 import com.kalk.jmr.ui.settings.SettingsViewModel
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.recommendations_fragment.*
@@ -28,6 +27,7 @@ class RecommendationsFragment() : Fragment() {
     private lateinit var recommendations: RecommendationsViewModel
     private lateinit var settings: SettingsViewModel
     private lateinit var songList:List<String>
+    private lateinit var genreViewModel:GenresViewModel
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +50,7 @@ class RecommendationsFragment() : Fragment() {
          */
         settings = ViewModelProviders.of(activity!!).get(SettingsViewModel::class.java)
 
+
         settings.activity.observe(this, Observer {
             recommendations_activity.visibility = if(it!!) View.VISIBLE else View.GONE })
         settings.location.observe(this, Observer {
@@ -59,9 +60,14 @@ class RecommendationsFragment() : Fragment() {
         /**
          * RECOMMENDATIONS
          */
+        val factory = GenresViewModelFactory(getGenreRepository(activity!!.applicationContext))
+        genreViewModel = ViewModelProviders.of(activity!!, factory).get(GenresViewModel::class.java)
+
         recommendations = ViewModelProviders.of(activity!!).get(RecommendationsViewModel::class.java)
 
-        recommendations.getGenre().observe(this, Observer {
+        recommendations_chosen_genre.text = resources.getString(R.string.chosen_genre, genreViewModel.genreText.value)
+
+        genreViewModel.genreText.observe( this, Observer {
             recommendations_chosen_genre.text = resources.getString(R.string.chosen_genre, it) })
 
         recommendations.getCurrentActivity().observe(this, Observer {
