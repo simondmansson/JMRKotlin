@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +13,9 @@ import android.widget.Toast
 import androidx.core.widget.toast
 import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
-import com.kalk.jmr.db.playlist.Playlist
+import com.kalk.jmr.db.playlist.HistoryPlaylist
+import com.kalk.jmr.getPlaylistRepository
+import kotlinx.android.synthetic.main.history_fragment.*
 import kotlinx.android.synthetic.main.main_activity.*
 
 
@@ -22,7 +25,7 @@ class HistoryFragment : Fragment() {
     }
 
     private lateinit var playCommands: PlayCommands
-    private lateinit var history:HistoryViewModel
+    private lateinit var historyViewModel:HistoryViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -38,19 +41,21 @@ class HistoryFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        history = ViewModelProviders.of(this).get(HistoryViewModel::class.java)
+        historyViewModel = ViewModelProviders.of(this, HistoryViewModelFactory(
+                getPlaylistRepository(activity!!.applicationContext)))
+                .get(HistoryViewModel::class.java)
 
-        val playLists: List<Playlist> = history.playlists.value ?: listOf()
+        val playLists: List<HistoryPlaylist> = historyViewModel.playlists.value ?: listOf()
         val adapter =  PlaylistAdapter(playLists) {
             context?.toast("${it.title} Clicked", Toast.LENGTH_SHORT)
-            val playlist = playLists.filter { plist -> plist.id == it.id }
-           // playCommands.play(playlist[0].songs)
+            val songs = it.uri.map { it.uri }
+            playCommands.play(songs)
         }
 
-        //history_recycler.layoutManager = LinearLayoutManager(context)
-        //history_recycler.adapter = adapter
+        history_recycler.layoutManager = LinearLayoutManager(context)
+        history_recycler.adapter = adapter
 
-        history.getPlaylists().observe(this, Observer(function = {
+        historyViewModel.playlists.observe(this, Observer(function = {
             adapter.updatePlayList(if (it != null) it else playLists)
         }))
 

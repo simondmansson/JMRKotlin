@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.kalk.jmr.R
-import com.kalk.jmr.db.playlist.Playlist
+import com.kalk.jmr.db.playlist.HistoryPlaylist
 import kotlinx.android.synthetic.main.playlist_card_view.view.*
 
 /**
@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.playlist_card_view.view.*
  * @param playlists List of @class Playlist
  * @param listener
  */
-class PlaylistAdapter(private var playlists: List<Playlist>, val listener: (Playlist) -> Unit) :
+class PlaylistAdapter(private var playlists: List<HistoryPlaylist>, val listener: (HistoryPlaylist) -> Unit) :
         RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,7 +28,7 @@ class PlaylistAdapter(private var playlists: List<Playlist>, val listener: (Play
     override fun getItemCount() = playlists.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(playlist: Playlist, listener: (Playlist) -> Unit) = with(itemView) {
+        fun bind(playlist: HistoryPlaylist, listener: (HistoryPlaylist) -> Unit) = with(itemView) {
             _playlist_card_title.text = playlist.title
             playlist_button_card.setOnClickListener {
                 view ->
@@ -38,7 +38,7 @@ class PlaylistAdapter(private var playlists: List<Playlist>, val listener: (Play
         }
     }
 
-    fun updatePlayList(newlists: List<Playlist>) {
+    fun updatePlayList(newlists: List<HistoryPlaylist>) {
         playlists = newlists
         notifyDataSetChanged()
     }
