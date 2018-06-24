@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.core.widget.toast
 import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
-import com.kalk.jmr.db.playlist.HistoryPlaylist
 import com.kalk.jmr.getPlaylistRepository
 import kotlinx.android.synthetic.main.history_fragment.*
 import kotlinx.android.synthetic.main.main_activity.*
@@ -45,8 +44,7 @@ class HistoryFragment : Fragment() {
                 getPlaylistRepository(activity!!.applicationContext)))
                 .get(HistoryViewModel::class.java)
 
-        val playLists: List<HistoryPlaylist> = historyViewModel.playlists.value ?: listOf()
-        val adapter =  PlaylistAdapter(playLists) {
+        val adapter =  PlaylistAdapter(historyViewModel.playlists.value ?: listOf()) {
             context?.toast("${it.title} Clicked", Toast.LENGTH_SHORT)
             val songs = it.uri.map { it.uri }
             playCommands.play(songs)
@@ -56,7 +54,7 @@ class HistoryFragment : Fragment() {
         history_recycler.adapter = adapter
 
         historyViewModel.playlists.observe(this, Observer(function = {
-            adapter.updatePlayList(if (it != null) it else playLists)
+            adapter.updatePlayList(if (it != null) it else historyViewModel.playlists.value ?: listOf())
         }))
 
     }

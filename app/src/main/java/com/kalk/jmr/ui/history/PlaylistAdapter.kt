@@ -9,7 +9,6 @@ import com.kalk.jmr.db.playlist.HistoryPlaylist
 import kotlinx.android.synthetic.main.playlist_card_view.view.*
 
 /**
- *
  * Maps playlists elements to card views in the UI
  * @param playlists List of @class Playlist
  * @param listener
