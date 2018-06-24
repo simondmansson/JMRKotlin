@@ -32,6 +32,7 @@
             android:layout_gravity="bottom"
             android:layout_marginStart="@dimen/fab_margin"
             android:layout_marginBottom="8dp"
+            app:additionalPaddingStartForIcon="12dp"
             app:icon="@drawable/ic_play_arrow_white_24dp"
             app:iconPadding="@dimen/fab_margin"
             tools:ignore="MissingPrefix" />
