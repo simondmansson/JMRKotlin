@@ -14,19 +14,17 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
 
-        <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/toolbar_main_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        tools:text="Hello"
-        android:textColor="@color/white"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-        />
+        <TextView
+            android:id="@+id/toolbar_main_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textColor="@color/white"
+            tools:text="asd" />
+
     </android.support.v7.widget.Toolbar>
 
     <android.support.v4.view.ViewPager
