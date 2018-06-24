@@ -32,25 +32,25 @@ class TrackDaoTests {
 
     @Test
     fun adds_a_track_to_the_db() {
-        val track = Track(1, "asd", "bb-dd")
+        val track = Track("asd", "bb-dd")
         dao.addTrack(track)
-        val queryResult = dao.byId(track.id)
-        assertEquals(queryResult.id, track.id)
-        assertEquals(queryResult.uri, track.uri)
-        assertEquals(queryResult.title, track.title)
+        val queryResult = dao.byUri(track.uri)
+        assertEquals( track.uri, queryResult.uri)
+        assertEquals(track.title, queryResult.title)
     }
 
     @Test
     fun track_with_same_uri_as_existing_track_wont_be_added_to_db() {
-        val track = Track(1, "asd", "bb-dd")
-        val track2 = Track(2, "asd", "22-dd")
+        val track = Track("asd", "bb-dd")
+        val track2 = Track("asd", "22-dd")
         dao.addTrack(track)
         dao.addTrack(track2)
-        val queryResult = dao.byId(track.id)
-        assertEquals(queryResult.id, track.id)
-        assertEquals(queryResult.uri, track.uri)
-        assertEquals(queryResult.title, track.title)
-        val queryResult2 = dao.byId(track2.id)
-        assertEquals(queryResult2, null)
+        val queryResult = dao.byUri(track.uri)
+        assertEquals(track.uri, queryResult.uri)
+        assertEquals(track.title, queryResult.title)
+        val queryResult2 = dao.byUri(track2.uri)
+        assertEquals(track.uri, queryResult2.uri)
+        assertEquals(track.title, queryResult2.title)
     }
+
 }

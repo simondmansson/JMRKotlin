@@ -18,9 +18,9 @@ class PlaylistDaoTests {
     private lateinit var dao: PlaylistDao
 
     private val playlists = arrayListOf(
-            Playlist(1, "123", location = 1, activity = 2, genre = 3, time = 23),
-            Playlist(2, "223", location = 2, activity = 2, genre = 3, time = 23),
-            Playlist(3, "233", location = 2, activity = 3, genre = 3, time = 23)
+            Playlist("UUID", "123", location = 1, activity = 2, genre = 3, time = 23),
+            Playlist("UUID2", "223", location = 2, activity = 2, genre = 3, time = 23),
+            Playlist("UUID3", "233", location = 2, activity = 3, genre = 3, time = 23)
     )
 
     @Before
@@ -38,7 +38,7 @@ class PlaylistDaoTests {
 
     @Test
     fun should_add_playlist_to_db() {
-        val plist = Playlist(1, "asd", location = 1, activity = 1, genre = 1, time = 23)
+        val plist = Playlist("UUID", "asd", location = 1, activity = 1, genre = 1, time = 23)
         dao.addPlaylist(plist)
         assertEquals(dao.selectAll().size, 1)
     }

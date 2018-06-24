@@ -32,12 +32,11 @@ class PlaylistTracksDaoTest {
 
     @Test
     fun should_add_playlistTracks() {
-        val track = Track (1, "asd", "333")
+        val track = Track ("asd", "333")
         tdao.addTrack(track)
-        pldao.addPlaylistTrack(PlaylistTrack(1, 1))
-        val pl = pldao.findTracksbyId(1)
+        pldao.addPlaylistTrack(PlaylistTrack("UUID", "asd"))
+        val pl = pldao.findTracksbyId("UUID")
         assertEquals(pl.size, 1)
-        assertEquals(pl[0].id, track.id)
         assertEquals(pl[0].uri, track.uri)
         assertEquals(pl[0].title, track.title)
     }
