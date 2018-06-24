@@ -1,0 +1,11 @@
+package com.kalk.jmr
+
+const val CLIENT_ID = "b846f536be0747dbb3b7a8a10946c4be"
+const val REDIRECT_URI = "JMR://spotify/callback"
+const val SWITCH_ACTIVITY = "SWITCH_ACTIVITY"
+const val SWITCH_LOCATION = "SWITCH_LOCATION"
+const val SWITCH_TIME = "SWITCH_TIME"
+const val CHOSEN_GENRE = "CHOSEN_GENRE"
+const val LOCATION_TIMESTAMP = "LOCATION_TIMESTAMP"
+const val TOKEN_TIMESTAMP = "TOKEN_TIMESTAMP"
+const val TOKEN_STRING = "TOKEN_STRING"
