@@ -38,12 +38,6 @@ import org.jetbrains.anko.toast
 
 @SuppressLint("MissingPermission")
 class MainActivity : AppCompatActivity(), PlayCommands {
-    private val CLIENT_ID = "b846f536be0747dbb3b7a8a10946c4be"
-    private val REDIRECT_URI = "JMR://spotify/callback"
-    private val SWITCH_ACTIVITY = "SWITCH_ACTIVITY"
-    private val SWITCH_LOCATION = "SWITCH_LOCATION"
-    private val SWITCH_TIME = "SWITCH_TIME"
-    private val CHOSEN_GENRE = "CHOSEN_GENRE"
 
     private lateinit var navController: NavController
     private lateinit var mSpotifyAppRemote: SpotifyAppRemote
@@ -92,22 +86,30 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             mActivityRecognitionClient.requestActivityUpdates(30*1000, getActivityDetectionPendingIntent())
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+        //if(System.currentTimeMillis().minus(preferences.getLong(LOCATION_TIMESTAMP, Long.MAX_VALUE)) <= 0)
+         getLatestKnownLocation()
     }
 
     override fun onStart() {
         super.onStart()
 
+        //Setup Spotify
         if(SpotifyAppRemote.isSpotifyInstalled(applicationContext)) {
 
-            val time = System.currentTimeMillis().minus(recommendationsViewModel.authToken.value?.timestamp ?: Long.MAX_VALUE)
-            if(time <= 0 ) {
+            //If recommendationsViewModel have a token it will be used. Else we get it from preferences or default value
+            val token = recommendationsViewModel.authToken.value ?: Token(
+                    preferences.getString(TOKEN_STRING, ""),
+                    preferences.getLong(TOKEN_TIMESTAMP, Long.MAX_VALUE)
+            )
+
+            if(shouldRequestNewToken(token, System.currentTimeMillis())) {
                 val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
                 builder.setScopes(arrayOf("app-remote-control", "user-read-recently-played", "user-read-private", "streaming"))
                 val request = builder.build()
                 AuthenticationClient.openLoginActivity(this, 1442, request)
-
             }
-            //Setup Spotify
+
             connectionParams = ConnectionParams.Builder(CLIENT_ID)
                     .setRedirectUri(REDIRECT_URI)
                     .showAuthView(true)
@@ -143,7 +145,6 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         LocalBroadcastManager.getInstance(applicationContext)
                 .registerReceiver(mBroadcastReceiver, IntentFilter(ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name))
 
-        getLatestKnownLocation()
     }
 
     override fun onResume() {
@@ -159,6 +160,8 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             putBoolean(SWITCH_LOCATION, settings.location.value ?: true)
             putBoolean(SWITCH_TIME, settings.time.value ?: true)
             putInt(CHOSEN_GENRE, genreViewModel.chosenGenre.value ?: 0)
+            putLong(TOKEN_TIMESTAMP, recommendationsViewModel.authToken.value?.timestamp ?: Long.MAX_VALUE)
+            putString(TOKEN_STRING, recommendationsViewModel.authToken.value?.token)
             apply()
         }
 

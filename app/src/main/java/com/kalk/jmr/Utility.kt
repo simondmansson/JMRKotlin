@@ -10,6 +10,7 @@ import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.PlaylistRepository
 import com.kalk.jmr.db.RecommendationsRepository
 import com.kalk.jmr.db.genre.GenreRepository
+import com.kalk.jmr.ui.recommendations.Token
 import java.util.concurrent.Executors
 
 
@@ -44,5 +45,15 @@ fun getRecommendationsRepository(context: Context): RecommendationsRepository {
 
 fun getPlaylistRepository(context: Context): PlaylistRepository {
     val db = AppDatabase.getInstance(context)
-    return PlaylistRepository.getInstance(db.playListTracksDao(), db.playlistDao())
+    return PlaylistRepository.getInstance(db.trackDao(), db.playListTracksDao(), db.playlistDao())
+}
+
+
+const val fiftyFiveMinutes = 3_300_000L
+fun shouldRequestNewToken(token: Token, currentTime: Long): Boolean {
+    when {
+        token.token.isEmpty() -> return true
+        currentTime.minus(token.timestamp) < fiftyFiveMinutes -> return false
+        else -> return true
+    }
 }
