@@ -13,7 +13,7 @@ class UtilityTests {
     val fortyFiveMinutes = 2_700_000L
     val fifteenMinutes = 900_000L
     val tokenString = "abc"
-    val dummyLoc = UserLocation(1, coordinates = Coordinates(0.0,0.0))
+    val dummyLoc = UserLocation("UUID", coordinates = Coordinates(0.0,0.0))
 
     @Test
     fun should_Request_New_Token_when_string_is_empty() {
