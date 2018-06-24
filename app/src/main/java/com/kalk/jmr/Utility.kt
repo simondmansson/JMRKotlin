@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.app.ActivityCompat
 import com.kalk.jmr.db.AppDatabase
+import com.kalk.jmr.db.PlaylistRepository
 import com.kalk.jmr.db.RecommendationsRepository
 import com.kalk.jmr.db.genre.GenreRepository
 import java.util.concurrent.Executors
@@ -37,6 +38,11 @@ fun getGenreRepository(context: Context): GenreRepository {
 }
 
 fun getRecommendationsRepository(context: Context): RecommendationsRepository {
-        val db =  AppDatabase.getInstance(context)
+       // val db =  AppDatabase.getInstance(context)
     return  RecommendationsRepository.getInstance()
+}
+
+fun getPlaylistRepository(context: Context): PlaylistRepository {
+    val db = AppDatabase.getInstance(context)
+    return PlaylistRepository.getInstance(db.playListTracksDao(), db.playlistDao())
 }
