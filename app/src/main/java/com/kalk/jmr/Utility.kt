@@ -10,6 +10,7 @@ import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.PlaylistRepository
 import com.kalk.jmr.db.RecommendationsRepository
 import com.kalk.jmr.db.genre.GenreRepository
+import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.ui.recommendations.Token
 import java.util.concurrent.Executors
 
@@ -54,6 +55,16 @@ fun shouldRequestNewToken(token: Token, currentTime: Long): Boolean {
     when {
         token.token.isEmpty() -> return true
         currentTime.minus(token.timestamp) < fiftyFiveMinutes -> return false
+        else -> return true
+    }
+}
+
+const val fifteenMinutes = 900_000L
+
+fun shouldRequestNewLocation(location: UserLocation, savedTime:Long, currentTime: Long): Boolean {
+    when {
+        location.id == -1 -> return true
+        currentTime.minus(savedTime) < fifteenMinutes -> return false
         else -> return true
     }
 }

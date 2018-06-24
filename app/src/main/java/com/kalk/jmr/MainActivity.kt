@@ -19,6 +19,9 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.kalk.jmr.db.AppDatabase
+import com.kalk.jmr.db.location.Coordinates
+import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.enums.ActivityBroadcast
 import com.kalk.jmr.ui.genres.GenresViewModel
 import com.kalk.jmr.ui.genres.GenresViewModelFactory
@@ -34,6 +37,7 @@ import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
 import kotlinx.android.synthetic.main.main_activity.*
 import org.jetbrains.anko.toast
+import java.util.*
 
 
 @SuppressLint("MissingPermission")
@@ -87,7 +91,12 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        //if(System.currentTimeMillis().minus(preferences.getLong(LOCATION_TIMESTAMP, Long.MAX_VALUE)) <= 0)
+        val storedUserLocation = recommendationsViewModel.currentLocation.value ?:
+                UserLocation(preferences.getInt(LOCATION_ID, -1),
+                Coordinates(preferences.getLong(LOCATION_LONGITUDE, 0).toDouble(), preferences.getLong(LOCATION_LATITUDE, 0).toDouble())
+        )
+
+        if(shouldRequestNewLocation(storedUserLocation, preferences.getLong(LOCATION_TIMESTAMP, Long.MAX_VALUE), System.currentTimeMillis()))
          getLatestKnownLocation()
     }
 
@@ -237,14 +246,24 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                     1337)
         } else {
             Log.d(TAG, "Permissions previously granted")
-            if(settings.location.value!!) {
-                mFusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                    toast("long ${it.longitude} untz lat ${it.latitude}")
-                    recommendationsViewModel.setLocation("long ${it.longitude} untz lat ${it.latitude}")
+            mFusedLocationProviderClient.lastLocation.addOnSuccessListener {
+                toast("long ${it.longitude} and lat ${it.latitude}")
+                ioThread {
+                    val  db =  AppDatabase.getInstance(applicationContext)
+                    //TODO HELPER FUNCTION FOR RETURNING DIFFS
+                    val previousLocationInRange = db.locationDao().inRangeOfCoordinates(it.longitude, it.latitude, it.longitude, it.latitude)
+
+                    if(previousLocationInRange != null) {
+                        recommendationsViewModel.setLocation(previousLocationInRange)
+                    } else {
+                        val userLoc = UserLocation(UUID.randomUUID().variant(), Coordinates(it.longitude, it.latitude))
+                        recommendationsViewModel.setLocation(userLoc)
+                        db.locationDao().addLocation(userLoc)
+                    }
+                }
                 }
             }
         }
-    }
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
