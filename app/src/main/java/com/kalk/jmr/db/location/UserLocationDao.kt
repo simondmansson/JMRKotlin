@@ -8,7 +8,7 @@ import android.arch.persistence.room.Query
 interface UserLocationDao {
 
     @Query("Select * from locations where id = :id")
-    fun byId(id: Int): UserLocation
+    fun byId(id: String): UserLocation
 
     @Query("Select * from locations where longitude between :longFrom and  :longTo and latitude between :latFrom and :latTo")
     fun inRangeOfCoordinates(longFrom: Double, latFrom:Double, longTo: Double, latTo:Double): UserLocation

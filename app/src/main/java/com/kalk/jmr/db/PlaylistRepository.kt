@@ -3,8 +3,11 @@ package com.kalk.jmr.db
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.kalk.jmr.db.playlist.HistoryPlaylist
+import com.kalk.jmr.db.playlist.Playlist
 import com.kalk.jmr.db.playlist.PlaylistDao
+import com.kalk.jmr.db.playlistTracks.PlaylistTrack
 import com.kalk.jmr.db.playlistTracks.PlaylistTracksDao
+import com.kalk.jmr.db.track.Track
 import com.kalk.jmr.db.track.TrackDao
 import com.kalk.jmr.ioThread
 
@@ -28,8 +31,12 @@ class PlaylistRepository private constructor(val trackDao: TrackDao, val playlis
         return playlists
     }
 
-    fun addPlaylist() {
-
+    fun storePlaylist(playlist: Playlist, tracks:List<Track>) {
+        playlistDao.addPlaylist(playlist)
+        tracks.forEach {
+                trackDao.addTrack(it)
+                playlistTracksDao.addPlaylistTrack(PlaylistTrack(playlist.id, it.uri))
+        }
     }
 
     companion object {

@@ -5,8 +5,8 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 @Dao
 interface TrackDao {
-    @Query("Select * from tracks where id = :id")
-    fun byId(id: Int): Track
+    @Query("Select * from tracks where uri = :uri")
+    fun byUri(uri: String): Track
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun addTrack(track: Track)

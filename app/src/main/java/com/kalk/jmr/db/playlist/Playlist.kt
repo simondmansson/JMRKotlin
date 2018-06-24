@@ -14,7 +14,7 @@ import com.kalk.jmr.db.userActivity.UserActivity
         ])
 data class Playlist(
         @PrimaryKey
-        val id: Int,
+        val id: String,
         val title: String,
         @ForeignKey(entity = UserLocation::class, parentColumns = ["id"], childColumns = ["location"])
         val location:Int,

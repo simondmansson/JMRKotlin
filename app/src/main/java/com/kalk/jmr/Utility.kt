@@ -8,12 +8,10 @@ import android.os.Build
 import android.support.v4.app.ActivityCompat
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.PlaylistRepository
-import com.kalk.jmr.db.RecommendationsRepository
 import com.kalk.jmr.db.genre.GenreRepository
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.ui.recommendations.Token
 import java.util.concurrent.Executors
-
 
 val GPS_PERMISSIONS = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
 
@@ -39,11 +37,6 @@ fun getGenreRepository(context: Context): GenreRepository {
     return  GenreRepository.getInstance(AppDatabase.getInstance(context).genreDao())
 }
 
-fun getRecommendationsRepository(context: Context): RecommendationsRepository {
-       // val db =  AppDatabase.getInstance(context)
-    return  RecommendationsRepository.getInstance()
-}
-
 fun getPlaylistRepository(context: Context): PlaylistRepository {
     val db = AppDatabase.getInstance(context)
     return PlaylistRepository.getInstance(db.trackDao(), db.playListTracksDao(), db.playlistDao())
@@ -63,7 +56,7 @@ const val fifteenMinutes = 900_000L
 
 fun shouldRequestNewLocation(location: UserLocation, savedTime:Long, currentTime: Long): Boolean {
     when {
-        location.id == -1 -> return true
+        location.id.isEmpty() -> return true
         currentTime.minus(savedTime) < fifteenMinutes -> return false
         else -> return true
     }
