@@ -26,7 +26,7 @@ class GenresAdapter(private var genres: List<Genre>, private val listener: (Stri
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 
         fun bind(genre: Genre, listener: (String) -> Unit) = with(itemView) {
-            genre_card_title.text = genre.genre
+            genre_card_title.text = genre.genre.capitalize()
             genre_card_title.setOnClickListener {
                 view ->  listener.invoke(genre.id.toString())
             }

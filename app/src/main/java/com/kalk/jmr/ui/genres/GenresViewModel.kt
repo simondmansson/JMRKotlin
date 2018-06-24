@@ -12,6 +12,6 @@ class GenresViewModel internal constructor(private val repo: GenreRepository): V
     val genres: LiveData<List<Genre>> = Transformations.map(repo.getGenres()) { it }
     val chosenGenre: MutableLiveData<Int> = MutableLiveData()
     val genreText: LiveData<String> = Transformations.map(chosenGenre, {
-         genres.value?.get(chosenGenre.value ?: 0)?.genre
+         genres.value?.get(chosenGenre.value ?: 0)?.genre?.capitalize()
     })
 }
