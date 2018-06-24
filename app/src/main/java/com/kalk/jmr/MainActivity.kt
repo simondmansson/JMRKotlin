@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                 ioThread {
                     val  db =  AppDatabase.getInstance(applicationContext)
                     //TODO HELPER FUNCTION FOR RETURNING DIFFS
-                    val previousLocationInRange = db.locationDao().inRangeOfCoordinates(it.longitude, it.latitude, it.longitude, it.latitude)
+                    val previousLocationInRange: UserLocation? = db.locationDao().inRangeOfCoordinates(it.longitude, it.latitude, it.longitude, it.latitude)
 
                     if(previousLocationInRange != null) {
                         recommendationsViewModel.setLocation(previousLocationInRange)
