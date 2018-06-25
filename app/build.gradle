@@ -57,6 +57,10 @@ dependencies {
     //Google ActivityBroadcast Recognition
     implementation "com.google.android.gms:play-services-location:$rootProject.googlePlaySerivceLocationVersion"
 
+    //Webservice calls
+    implementation "com.squareup.retrofit2:retrofit:$rootProject.retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofitVersion"
+
     // Anko Commons
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
     implementation "org.jetbrains.anko:anko-design:$ankoVersion" // For SnackBars
