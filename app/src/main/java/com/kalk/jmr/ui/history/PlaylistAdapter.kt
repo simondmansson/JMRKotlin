@@ -37,6 +37,12 @@ class PlaylistAdapter(private var playlists: List<HistoryPlaylist>, val listener
         }
     }
 
+    fun removeAt(position: Int, listener: (HistoryPlaylist) -> Unit) {
+        val pl = playlists.get(index = position)
+        listener.invoke(pl)
+        playlists = playlists.filterIndexed { index, historyPlaylist -> index != position  }
+        notifyItemRemoved(position)
+    }
     fun updatePlayList(newlists: List<HistoryPlaylist>) {
         playlists = newlists
         notifyDataSetChanged()

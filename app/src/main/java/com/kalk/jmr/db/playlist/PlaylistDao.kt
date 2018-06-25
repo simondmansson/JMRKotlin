@@ -3,6 +3,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
+
 @Dao
 interface PlaylistDao {
     @Query ("Select * from playlists")
@@ -45,4 +46,7 @@ interface PlaylistDao {
 
     @Insert
     fun addPlaylist(playlist: Playlist)
+
+    @Query("Delete from playlists where id = :id")
+    fun removePlaylist(id: String)
 }

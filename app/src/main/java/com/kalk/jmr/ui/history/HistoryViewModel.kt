@@ -10,4 +10,5 @@ class HistoryViewModel internal constructor(private val repo: PlaylistRepository
 
     val playlists: LiveData<List<HistoryPlaylist>> = Transformations.map(repo.getPlaylists()) { it }
 
+    fun removePlaylist(id:String) = repo.removePlaylist(id)
 }

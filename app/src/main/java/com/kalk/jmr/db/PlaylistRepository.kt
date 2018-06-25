@@ -27,7 +27,7 @@ class PlaylistRepository private constructor(val trackDao: TrackDao, val playlis
                 if (track != null)
                     songs.add(track)
             }
-            HistoryPlaylist(playlist.title, songs)
+            HistoryPlaylist(playlist.id ,playlist.title, songs)
         }
     })
 
@@ -43,7 +43,12 @@ class PlaylistRepository private constructor(val trackDao: TrackDao, val playlis
                 playlistTracksDao.addPlaylistTrack(PlaylistTrack(playlist.id, it.uri))
             }
         }
+    }
 
+    fun removePlaylist(id:String){
+        ioThread {
+            playlistDao.removePlaylist(id)
+        }
     }
 
     companion object {
