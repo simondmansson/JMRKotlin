@@ -23,6 +23,7 @@ import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.location.Coordinates
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.enums.ActivityBroadcast
+import com.kalk.jmr.enums.validAcitvityBuilder
 import com.kalk.jmr.ui.genres.GenresViewModel
 import com.kalk.jmr.ui.genres.GenresViewModelFactory
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
@@ -146,7 +147,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                     val confidence = intent.getIntExtra(ActivityBroadcast.ACTIVITY_CONFIDENCE.name, 0)
                     val type = intent.getStringExtra(ActivityBroadcast.DETECTED_ACTIVITY.name)
                     Log.i(TAG, "received $type with confidence $confidence")
-                    recommendationsViewModel.setActivity(type)
+                    recommendationsViewModel.setActivity(validAcitvityBuilder(type))
                 }
             }
         }
