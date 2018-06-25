@@ -11,5 +11,5 @@ import android.arch.persistence.room.PrimaryKey
 data class Track(
         @PrimaryKey
         val uri:String,
-        val title:String
+        val name:String
 )
