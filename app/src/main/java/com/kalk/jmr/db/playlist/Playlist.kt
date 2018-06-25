@@ -17,7 +17,7 @@ data class Playlist(
         val id: String,
         val title: String,
         @ForeignKey(entity = UserLocation::class, parentColumns = ["id"], childColumns = ["location"])
-        val location:Int,
+        val location:String,
         @ForeignKey(entity = UserActivity::class, parentColumns = ["id"], childColumns = ["activity"])
         val activity:Int,
         @ForeignKey(entity = Genre::class, parentColumns = ["id"], childColumns = ["genre"])

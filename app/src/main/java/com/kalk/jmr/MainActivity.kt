@@ -95,9 +95,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         val storedUserLocation = recommendationsViewModel.currentLocation.value
-                ?: UserLocation(preferences.getString(LOCATION_ID, ""),
-                        Coordinates(preferences.getLong(LOCATION_LONGITUDE, 0).toDouble(), preferences.getLong(LOCATION_LATITUDE, 0).toDouble())
-                )
+                ?: UserLocation("", Coordinates(0.0, 0.0))
 
         if (shouldRequestNewLocation(storedUserLocation, preferences.getLong(LOCATION_TIMESTAMP, Long.MAX_VALUE), System.currentTimeMillis()))
             getLatestKnownLocation()
@@ -256,25 +254,10 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
                     if (previousLocationInRange != null) {
                         recommendationsViewModel.setLocation(previousLocationInRange)
-                        with(preferences.edit()) {
-                            putString(LOCATION_ID, previousLocationInRange.id)
-                            putLong(LOCATION_LONGITUDE, previousLocationInRange.coordinates.longitude.toLong())
-                            putLong(LOCATION_LATITUDE, previousLocationInRange.coordinates.latitude.toLong())
-                            putLong(LOCATION_TIMESTAMP, System.currentTimeMillis())
-                            apply()
-                        }
-
                     } else {
                         val userLoc = UserLocation(UUID.randomUUID().toString(), Coordinates(it.longitude, it.latitude))
                         recommendationsViewModel.setLocation(userLoc)
                         db.locationDao().addLocation(userLoc)
-                        with(preferences.edit()) {
-                            putString(LOCATION_ID, userLoc.id)
-                            putLong(LOCATION_LONGITUDE, userLoc.coordinates.longitude.toLong())
-                            putLong(LOCATION_LATITUDE, userLoc.coordinates.latitude.toLong())
-                            putLong(LOCATION_TIMESTAMP, System.currentTimeMillis())
-                            apply()
-                        }
                     }
                 }
             }

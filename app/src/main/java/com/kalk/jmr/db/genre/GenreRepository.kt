@@ -1,17 +1,7 @@
 package com.kalk.jmr.db.genre
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import com.kalk.jmr.ioThread
-
 class GenreRepository private constructor(private val genreDao: GenreDao)  {
-    private val genres: MutableLiveData<List<Genre>> = MutableLiveData()
 
-    init {
-        ioThread {
-            genres.postValue(genreDao.getAllGenres())
-        }
-    }
 
     companion object {
         private var sInstance: GenreRepository? = null
@@ -25,7 +15,5 @@ class GenreRepository private constructor(private val genreDao: GenreDao)  {
         }
     }
 
-    fun getGenres(): LiveData<List<Genre>> {
-       return genres
-    }
+    fun getGenres() = genreDao.getAllGenres()
 }

@@ -1,5 +1,6 @@
 package com.kalk.jmr.db.genre
 
+import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
@@ -11,7 +12,7 @@ interface GenreDao {
     fun byId(id: Int): Genre
 
     @Query("Select * from genres")
-    fun getAllGenres(): List<Genre>
+    fun getAllGenres(): LiveData<List<Genre>>
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
