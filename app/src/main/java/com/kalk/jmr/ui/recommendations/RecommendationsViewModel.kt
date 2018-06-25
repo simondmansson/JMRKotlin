@@ -8,11 +8,13 @@ import com.kalk.jmr.db.PlaylistRepository
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.db.playlist.Playlist
 import com.kalk.jmr.db.track.Track
+import com.kalk.jmr.db.userActivity.UserActivity
 import java.util.*
 
 class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
 
-    val currentActivity: MutableLiveData<String> = MutableLiveData()
+    val currentActivity: MutableLiveData<UserActivity> = MutableLiveData()
+    val currentActivityText: LiveData<String> = Transformations.map(currentActivity, { it.type })
     val currentLocation: MutableLiveData<UserLocation> = MutableLiveData()
     val authToken: MutableLiveData<Token> = MutableLiveData()
 
@@ -20,13 +22,12 @@ class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
             "${it.coordinates.longitude} ${it.coordinates.latitude}"
     })
 
-    fun setActivity(current: String) { currentActivity.value = current }
-    fun getCurrentActivity(): LiveData<String> { return currentActivity }
+    fun setActivity(current: UserActivity) { currentActivity.value = current }
 
     fun setLocation(current: UserLocation) { currentLocation.postValue(current)}
     fun getCurrentLocation(): LiveData<UserLocation> { return currentLocation }
 
-    fun makeRecommendation(): List<String> {
+    fun makeRecommendation(genre:Int): List<String> {
         val recommendations = getTracks()
 
         val calendar = Calendar.getInstance()
@@ -34,10 +35,10 @@ class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
         val day = calendar.get(Calendar.DAY_OF_WEEK)
         val playlist = Playlist(
                 UUID.randomUUID().toString(),
-                "${currentActivity.value} in ${currentLocationText.value}, ${dayOfWeek(day)} at $hourOfDay",
+                "${currentActivityText.value} in ${currentLocationText.value}, ${dayOfWeek(day)} at $hourOfDay",
                 currentLocation.value!!.id,
-                1,
-                2,
+                currentActivity.value!!.id,
+                genre,
                 hourOfDay)
 
         repo.storePlaylist(playlist, recommendations)

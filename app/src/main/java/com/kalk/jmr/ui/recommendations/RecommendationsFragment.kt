@@ -17,6 +17,7 @@ import com.kalk.jmr.ui.genres.GenresViewModelFactory
 import com.kalk.jmr.ui.settings.SettingsViewModel
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.recommendations_fragment.*
+import org.jetbrains.anko.design.snackbar
 import java.util.*
 
 
@@ -73,7 +74,7 @@ class RecommendationsFragment : Fragment() {
         genreViewModel.genreText.observe( this, Observer {
             recommendations_chosen_genre.text = resources.getString(R.string.chosen_genre, it) })
 
-        recommendationsViewModel.getCurrentActivity().observe(this, Observer {
+        recommendationsViewModel.currentActivityText.observe(this, Observer {
             recommendations_activity.text = resources.getString(R.string.current_activity, it)
         })
 
@@ -85,8 +86,13 @@ class RecommendationsFragment : Fragment() {
         recommendations_time.text = resources.getString(R.string.current_time, Date().toString().substring(0, 16))
 
         button_recommend?.setOnClickListener {
-            val tracks = recommendationsViewModel.makeRecommendation()
-            playCommands.play(tracks)
+            if(genreViewModel.chosenGenre.value != null) {
+                val tracks = recommendationsViewModel.makeRecommendation(genreViewModel.chosenGenre.value!!)
+                playCommands.play(tracks)
+            } else {
+                snackbar(this.view!!, "Please choose a genre")
+            }
+
         }
 
     }
