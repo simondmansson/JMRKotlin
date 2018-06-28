@@ -48,9 +48,10 @@ class HistoryFragment : Fragment() {
                 .get(HistoryViewModel::class.java)
 
         val adapter =  PlaylistAdapter(historyViewModel.playlists.value ?: listOf()) {
-            context?.toast("${it.title} Clicked", Toast.LENGTH_SHORT)
+
             val songs = it.uri.map { it.uri }
-            playCommands.play(songs)
+            context?.toast("${it.title} Clicked ${songs.size}", Toast.LENGTH_SHORT)
+            //playCommands.play(songs)
         }
 
         history_recycler.layoutManager = LinearLayoutManager(context)

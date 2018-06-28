@@ -20,4 +20,6 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getTargetContext()
         assertEquals("com.kalk.jmr", appContext.packageName)
     }
+
+
 }

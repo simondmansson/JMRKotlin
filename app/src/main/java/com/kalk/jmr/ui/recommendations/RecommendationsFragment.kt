@@ -85,10 +85,22 @@ class RecommendationsFragment : Fragment() {
 
         recommendations_time.text = resources.getString(R.string.current_time, Date().toString().substring(0, 16))
 
+
+
         button_recommend?.setOnClickListener {
-            if(genreViewModel.chosenGenre.value != null) {
-                val tracks = recommendationsViewModel.makeRecommendation(genreViewModel.chosenGenre.value!!)
-                playCommands.play(tracks)
+            if(genreViewModel.chosenGenre.value != null && genreViewModel.genreText.value != null ) {
+                val id = genreViewModel.chosenGenre.value!!
+                val text = genreViewModel.genreText.value!!
+                recommendationsViewModel.makeRecommendation(text)
+
+                recommendationsViewModel.tracks.observe(this, Observer{
+                    val songs = it?.map { it.uri }
+                    if(songs != null) {
+                        playCommands.play(songs)
+                        recommendationsViewModel.addPlaylist(id, it)
+                    }
+                })
+
             } else {
                 snackbar(this.view!!, "Please choose a genre")
             }

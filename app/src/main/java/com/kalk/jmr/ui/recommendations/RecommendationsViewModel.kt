@@ -17,6 +17,7 @@ class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
     val currentActivityText: LiveData<String> = Transformations.map(currentActivity, { it.type })
     val currentLocation: MutableLiveData<UserLocation> = MutableLiveData()
     val authToken: MutableLiveData<Token> = MutableLiveData()
+    val tracks = repo.TracksToPlay
 
     val currentLocationText: LiveData<String> = Transformations.map(currentLocation, {
             "${it.coordinates.longitude} ${it.coordinates.latitude}"
@@ -27,28 +28,22 @@ class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
     fun setLocation(current: UserLocation) { currentLocation.postValue(current)}
     fun getCurrentLocation(): LiveData<UserLocation> { return currentLocation }
 
-    fun makeRecommendation(genre:Int): List<String> {
-        val recommendations = getTracks()
+    fun makeRecommendation(genreText:String) = repo.requestTracks(authToken.value?.token ?: "", genreText)
 
+    fun addPlaylist(genreId:Int, recommendations: List<Track>) {
         val calendar = Calendar.getInstance()
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
         val day = calendar.get(Calendar.DAY_OF_WEEK)
+
         val playlist = Playlist(
                 UUID.randomUUID().toString(),
                 "${currentActivityText.value} in ${currentLocationText.value}, ${dayOfWeek(day)} at $hourOfDay",
                 currentLocation.value!!.id,
                 currentActivity.value!!.id,
-                genre,
+                genreId,
                 hourOfDay)
 
         repo.storePlaylist(playlist, recommendations)
-
-        return recommendations.map { it.uri }
-    }
-
-    fun getTracks() :List<Track>  {
-        return listOf(Track("3IDsegNBHC4pjGCOMTQYlU", "Baby, Baby - AmyGrant"),
-                Track("1iGXvUsVVkYBas0Cniw6NB", "Schokwave Gesaffelstein Remix - The Hacker"))
     }
 
    private fun dayOfWeek(day:Int):String {

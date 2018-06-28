@@ -199,11 +199,13 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
 
     override fun play(uris: List<String>) {
-        mSpotifyAppRemote.playerApi.play("spotify:track:${uris[0]}")
-        for (song in 1 until uris.size) {
-            mSpotifyAppRemote.playerApi.queue("spotify:track:${uris[song]}")
-            Log.e(TAG, uris[song])
+        if (mSpotifyAppRemote.isConnected) {
+            mSpotifyAppRemote.playerApi.play(uris[0])
+            for (song in 1 until uris.size) {
+                mSpotifyAppRemote.playerApi.queue(uris[song])
+            }
         }
+
     }
 
     //thanks google

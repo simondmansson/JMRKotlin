@@ -1,5 +1,6 @@
 package com.kalk.jmr
 
+import com.kalk.jmr.webService.GenreMessage
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -14,4 +15,6 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
+
+
 }
