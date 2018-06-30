@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.arch.lifecycle.ViewModelProviders
 import android.content.*
+import android.location.Geocoder
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.LocalBroadcastManager
@@ -25,8 +26,6 @@ import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.enums.ActivityBroadcast
 import com.kalk.jmr.enums.ValidActivity
 import com.kalk.jmr.enums.validAcitvityBuilder
-import com.kalk.jmr.ui.genres.GenresViewModel
-import com.kalk.jmr.ui.genres.GenresViewModelFactory
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModelFactory
 import com.kalk.jmr.ui.recommendations.Token
@@ -39,12 +38,14 @@ import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
 import kotlinx.android.synthetic.main.main_activity.*
 import org.jetbrains.anko.design.longSnackbar
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
+import java.io.IOException
 import java.util.*
 
 
 @SuppressLint("MissingPermission")
-class MainActivity : AppCompatActivity(), PlayCommands {
+class MainActivity : AppCompatActivity(), SpotifyCommands {
 
     private lateinit var navController: NavController
     private lateinit var mSpotifyAppRemote: SpotifyAppRemote
@@ -55,7 +56,6 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     private lateinit var preferences: SharedPreferences
     private lateinit var settings: SettingsViewModel
     private lateinit var recommendationsViewModel: RecommendationsViewModel
-    private lateinit var genreViewModel: GenresViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,13 +75,6 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                 .get(RecommendationsViewModel::class.java)
 
         recommendationsViewModel.setActivity(validAcitvityBuilder(ValidActivity.STILL.title)) //setActiviy to still on startup
-
-        genreViewModel = ViewModelProviders.of(this,
-                GenresViewModelFactory(
-                        getGenreRepository(applicationContext)))
-                .get(GenresViewModel::class.java)
-
-        genreViewModel.chosenGenre.value = preferences.getInt(CHOSEN_GENRE, 0)
 
         with(settings) {
             activity.value = preferences.getBoolean(SWITCH_ACTIVITY, true)
@@ -107,19 +100,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
         //Setup Spotify
         if (SpotifyAppRemote.isSpotifyInstalled(applicationContext)) {
-
-            //If recommendationsViewModel have a token it will be used. Else we get it from preferences or default value
-            val token = recommendationsViewModel.authToken.value ?: Token(
-                    preferences.getString(TOKEN_STRING, ""),
-                    preferences.getLong(TOKEN_TIMESTAMP, Long.MAX_VALUE)
-            )
-
-            if (shouldRequestNewToken(token, System.currentTimeMillis())) {
-                val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
-                builder.setScopes(arrayOf("app-remote-control", "user-read-recently-played", "user-read-private", "streaming"))
-                val request = builder.build()
-                AuthenticationClient.openLoginActivity(this, 1442, request)
-            }
+            requestAuthToken()
 
             connectionParams = ConnectionParams.Builder(CLIENT_ID)
                     .setRedirectUri(REDIRECT_URI)
@@ -167,21 +148,20 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             putBoolean(SWITCH_ACTIVITY, settings.activity.value ?: true)
             putBoolean(SWITCH_LOCATION, settings.location.value ?: true)
             putBoolean(SWITCH_TIME, settings.time.value ?: true)
-            putInt(CHOSEN_GENRE, genreViewModel.chosenGenre.value ?: 0)
             putLong(TOKEN_TIMESTAMP, recommendationsViewModel.authToken.value?.timestamp
                     ?: Long.MAX_VALUE)
             putString(TOKEN_STRING, recommendationsViewModel.authToken.value?.token)
             apply()
         }
         mActivityRecognitionClient.removeActivityUpdates(getActivityDetectionPendingIntent())
-
     }
 
     override fun onStop() {
         super.onStop()
-        if (mSpotifyAppRemote.isConnected) {
+        mSpotifyAppRemote.takeIf { mSpotifyAppRemote.isConnected }.apply {
             SpotifyAppRemote.CONNECTOR.disconnect(mSpotifyAppRemote)
         }
+
         LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(mBroadcastReceiver)
     }
 
@@ -194,6 +174,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.settingsFragment -> navController.navigate(R.id.settingsFragment)
+            R.id.aboutFragment -> navController.navigate(R.id.aboutFragment)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -202,7 +183,6 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
     override fun play(uris: List<String>) {
         Log.i(TAG, "Songs to play ${uris.size}")
-
         if (mSpotifyAppRemote.isConnected) {
             val playerState = mSpotifyAppRemote.playerApi.playerState.await()
             if(playerState.isSuccessful) {
@@ -220,11 +200,29 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                         for (song in 0 until uris.size) {
                             mSpotifyAppRemote.playerApi.queue(uris[song])
                         }
-                        longSnackbar(this@MainActivity.view_pager_main, "Queueing tracks")
+                        longSnackbar(this@MainActivity.view_pager_main,
+                                "Queueing track${if(uris.size > 1) "s" else ""}")
                     }
                 }
             }
         }
+    }
+
+    override fun requestAuthToken() {
+        //If recommendationsViewModel have a token it will be used. Else we get it from preferences or default value
+        val token = if(recommendationsViewModel.authToken.value != null) recommendationsViewModel.authToken.value!! else Token(preferences.getString(TOKEN_STRING, ""), preferences.getLong(TOKEN_TIMESTAMP, Long.MAX_VALUE))
+
+
+        if(shouldRequestNewToken(token, System.currentTimeMillis())) {
+            val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
+            builder.setScopes(arrayOf("app-remote-control", "user-read-private", "streaming"))
+            val request = builder.build()
+            AuthenticationClient.openLoginActivity(this, 1442, request)
+        } else  {
+            recommendationsViewModel.authToken.value = token
+        }
+
+
     }
 
     //thanks google
@@ -241,8 +239,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             val response = AuthenticationClient.getResponse(resultCode, intent)
             when (response.type) {
                 AuthenticationResponse.Type.TOKEN -> {
-                    Log.d(TAG, response.accessToken)
-                    toast(response.accessToken)
+                    Log.i(TAG, response.accessToken)
                     recommendationsViewModel.authToken.value = Token(response.accessToken, System.currentTimeMillis())
                 }
                 AuthenticationResponse.Type.ERROR -> Log.e(TAG, response.error)
@@ -255,6 +252,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
         when (requestCode) {
             1337 -> {
                 Log.d(TAG, "Permissions Granted")
+                getLatestKnownLocation()
                 return
             }
         }
@@ -269,11 +267,13 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             Log.d(TAG, "Permissions previously granted")
             mFusedLocationProviderClient.lastLocation.addOnSuccessListener {
                 toast("long ${it.longitude} and lat ${it.latitude}")
-                ioThread {
+                doAsync {
                     val db = AppDatabase.getInstance(applicationContext)
-                    //TODO HELPER FUNCTION FOR RETURNING DIFFS
-                    val previousLocationInRange: UserLocation? = db.locationDao().inRangeOfCoordinates(it.longitude, it.latitude, it.longitude, it.latitude)
-
+                    val fromLong = it.longitude - 0.0001
+                    val toLong = it.longitude + 0.0001
+                    val fromLat = it.latitude - 0.0001
+                    val toLat = it.latitude + 0.0001
+                    val previousLocationInRange: UserLocation? = db.locationDao().inRangeOfCoordinates(fromLong,fromLat, toLong, toLat)
                     if (previousLocationInRange != null) {
                         recommendationsViewModel.setLocation(previousLocationInRange)
                     } else {
@@ -281,7 +281,19 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                         recommendationsViewModel.setLocation(userLoc)
                         db.locationDao().addLocation(userLoc)
                     }
+
+                    try {
+                        val geo = Geocoder(applicationContext, Locale.getDefault())
+
+                        val addresses = geo.getFromLocation(it.longitude, it.latitude,1)
+                        applicationContext.toast("address ${addresses[0].getAddressLine(0)}")
+                    } catch (e: IOException) {
+                        Log.e(TAG, e.message)
+                    }
+
                 }
+
+
             }
         }
     }

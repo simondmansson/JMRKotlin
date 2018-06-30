@@ -1,6 +1,5 @@
 package com.kalk.jmr.db
 
-import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.kalk.jmr.buildJMRWebService
 import com.kalk.jmr.db.playlist.Playlist
@@ -11,27 +10,52 @@ import com.kalk.jmr.db.track.Track
 import com.kalk.jmr.db.track.TrackDao
 import com.kalk.jmr.ioThread
 import com.kalk.jmr.webService.GenreMessage
+import com.kalk.jmr.webService.HistoryMessage
 import com.kalk.jmr.webService.JMRWebService
 
 class PlaylistRepository private constructor(private val trackDao: TrackDao,
                                              private val playlistTracksDao: PlaylistTracksDao,
                                              private val playlistDao: PlaylistDao) {
 
-
-    val trackCount: MutableLiveData<Int> = MutableLiveData()
     val storedPlaylists = playlistDao.selectAll()
     private val service: JMRWebService
+
+    private val NOACTIVITY = -1
+    private val NOTIME = -1
 
     init {
         ioThread {
             Log.i(TAG, "stored tracks ${trackDao.allTracks()}")
-            Log.i(TAG, "playlistracks ${playlistTracksDao.selectAll()}")
+            Log.i(TAG, "playlist tracks ${playlistTracksDao.selectAll()}")
             Log.i(TAG, "stored tracks ${playlistDao.selectAll()}")
         }
         service = buildJMRWebService()
     }
 
     fun getTracksFromPlaylistId(id: String) = playlistTracksDao.findTracksbyId(id)
+
+    fun getTrackURisFromPlaylistIds(playlistIds: List<String>) = playlistTracksDao.findPlaylistUrisByIds(playlistIds)
+    /**
+     * WHERE DA UNIT TEST AT?!
+     */
+    fun getPlaylistIdsFromContextParameters(location: String, activity: Int, time: Int): List<String> {
+        Log.i(TAG, "Params: $location, $activity, $time")
+        var ids: List<String> = listOf()
+        when {
+            //SINGLE PARAM
+            location.isNotEmpty() && activity == NOACTIVITY && time == NOTIME -> { ids = playlistDao.selectByLocation(location); Log.i(TAG, "LOCATION") }
+            location.isEmpty() && activity == NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByTime(time-1, time+1); Log.i(TAG, "TIME") }
+            location.isEmpty() && activity != NOACTIVITY && time == NOTIME -> { ids = playlistDao.selectByActivity(activity) ; Log.i(TAG, "ACTIVITY") }
+            //PAIR OF PARAMS
+            location.isNotEmpty() && activity == NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByLocationAndTime(location, time-1, time+1); Log.i(TAG, "LOCATION AND TIME")}
+            location.isNotEmpty() && activity != NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByLocationAndActivity(location, activity); Log.i(TAG, "LOCATION AND ACTIVITY") }
+            location.isEmpty() && activity != NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByActivityAndTime(activity, time-1, time+1); Log.i(TAG, "ACTIVITY AND TIME") }
+            //TRIO
+            location.isNotEmpty() && activity != -1 && time != -1 -> { ids = playlistDao.selectByLocationAndActivityAndTime(location, activity, time-1, time+1); Log.i(TAG, "ALL THREE")}
+        }
+
+        return ids
+    }
 
     fun removePlaylist(id:String){
         ioThread {
@@ -53,7 +77,20 @@ class PlaylistRepository private constructor(private val trackDao: TrackDao,
             val tracks = res.body()
             return tracks!!
         } else  {
-            Log.e(TAG, " Retrieving from genre failed. Error msg: ${res.errorBody().toString()} ${res.code()}")
+            Log.e(TAG, " Retrieving from genre failed. Error msg: ${res.body()} ${res.code()}")
+        }
+        return listOf()
+    }
+
+    fun requestTracksFromHistory(token:String, uirs:List<String>):  List<Track> {
+        val message = HistoryMessage(token, uirs)
+        Log.i(TAG, message.toString())
+        val res = service.postRecommendationHistory(message).execute()
+        if(res.isSuccessful && res.body() != null) {
+            val tracks = res.body()
+            return tracks!!
+        } else  {
+            Log.e(TAG, " Retrieving from history failed. Error msg: ${res.body()} ${res.code()}")
         }
         return listOf()
     }

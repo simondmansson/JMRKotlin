@@ -4,15 +4,17 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import com.kalk.jmr.db.PlaylistRepository
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.db.playlist.Playlist
 import com.kalk.jmr.db.track.Track
 import com.kalk.jmr.db.userActivity.UserActivity
 import java.util.*
+import kotlin.collections.ArrayList
 
 class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
-
+    val TAG = RecommendationsViewModel::class.java.simpleName
     val currentActivity: MutableLiveData<UserActivity> = MutableLiveData()
     val currentActivityText: LiveData<String> = Transformations.map(currentActivity, { it.type })
     val currentLocation: MutableLiveData<UserLocation> = MutableLiveData()
@@ -24,10 +26,27 @@ class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
 
     fun setActivity(current: UserActivity) { currentActivity.value = current }
 
-    fun setLocation(current: UserLocation) { currentLocation.postValue(current)}
+    fun setLocation(current: UserLocation) { currentLocation.postValue(current) }
     fun getCurrentLocation(): LiveData<UserLocation> { return currentLocation }
 
-    fun makeRecommendation(genreText:String) = repo.requestTracksFromGenre(authToken.value?.token ?: "", genreText)
+    fun makeRecommendationFromGenre(genreText:String) = repo.requestTracksFromGenre(authToken.value?.token ?: "", genreText)
+
+    fun makeRecommendationFromHistory(uris: List<String>) = repo.requestTracksFromHistory(authToken.value?.token ?: "", uris)
+
+    /**
+     * THIS IS ONE CLUSTERFUCK OF A THING - SIMON 30/18 - 22:41
+     */
+    fun tracksConnectedToContext(checkForActivity:Boolean, checkForLocation:Boolean, checkForTime:Boolean): ArrayList<String> {
+        // -1 || empty string == don't query for this value
+        val plIds = repo.getPlaylistIdsFromContextParameters(
+                location = if (checkForLocation) currentLocation.value!!.id else "",
+                activity = if(checkForActivity) currentActivity.value!!.id else -1,
+                time = if(checkForTime) Date().toString().substring(11, 13).toInt() /*hour*/ else -1
+                )
+        Log.i(TAG, "plIDs $plIds")
+        val tracks = repo.getTrackURisFromPlaylistIds(plIds)
+        return ArrayList(tracks)
+    }
 
     fun storePlaylist(genreId: Int, tracks: List<Track>) {
         val calendar = Calendar.getInstance()

@@ -38,7 +38,6 @@ class HistoryDialogFragmentAdapter(private var tracks: ArrayList<Track>, val lis
             }
             tracklist_play_button.setOnClickListener {
                 listener.invoke(1, track)
-                context?.toast("Playing track ${track.name}")
             }
         }
     }

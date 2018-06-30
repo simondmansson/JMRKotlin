@@ -19,5 +19,11 @@
     <string name="home">home</string>
     <string name="genres">genres</string>
     <string name="tracks">Tracks</string>
+    <string name="from_what_i_usually_listen_to">From my context tracks</string>
+    <string name="how_would_you_like_to_be_recommended">How would you like to be recommended?</string>
+    <string name="from_my_chosen_genre">From My chosen Genre</string>
+    <string name="found_with_current_context">Found %d with current context</string>
+    <string name="about">About</string>
+    <string name="how_this_app_works">How this app works:</string>
 
 </resources>

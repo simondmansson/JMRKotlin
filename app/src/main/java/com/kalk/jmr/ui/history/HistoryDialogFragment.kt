@@ -8,8 +8,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
+import com.kalk.jmr.SpotifyCommands
 import com.kalk.jmr.db.track.Track
 import com.kalk.jmr.getPlaylistRepository
 import kotlinx.android.synthetic.main.history_dialog_fragment.*
@@ -18,7 +18,7 @@ import org.jetbrains.anko.doAsync
 class HistoryDialogFragment: DialogFragment() {
 
 
-    private lateinit var playCommands: PlayCommands
+    private lateinit var playCommands: SpotifyCommands
     private lateinit var historyViewModel:HistoryViewModel
 
     companion object {
@@ -35,7 +35,7 @@ class HistoryDialogFragment: DialogFragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        playCommands = context as PlayCommands
+        playCommands = context as SpotifyCommands
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -49,9 +49,9 @@ class HistoryDialogFragment: DialogFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val tracks = arguments?.get("list")
+        val tracks = arguments?.getParcelableArrayList<Track>("list") as ArrayList<Track>
         val playlistId = arguments!!.getString("playlistId")
-        val adapter = HistoryDialogFragmentAdapter(tracks as ArrayList<Track>) { type, track ->
+        val adapter = HistoryDialogFragmentAdapter(tracks) { type, track ->
             when(type) {
                 0 -> {
                     doAsync {

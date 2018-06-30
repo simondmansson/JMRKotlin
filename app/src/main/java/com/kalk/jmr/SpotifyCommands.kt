@@ -1,5 +1,6 @@
 package com.kalk.jmr
 
-interface PlayCommands {
+interface SpotifyCommands {
     fun play(uris:List<String>)
+    fun requestAuthToken()
 }

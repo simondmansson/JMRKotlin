@@ -40,14 +40,13 @@ class GenresFragment : Fragment() {
 
         genreViewModel.genres.observe(viewLifecycleOwner, Observer { adapter.updateGenres(it ?: listOf()) })
 
+        genre_current.text = resources.getString(R.string.chosen_genre, "pick one")
         genreViewModel.genreText.observe(viewLifecycleOwner, Observer {
-            genre_current.text = resources.getString(R.string.chosen_genre, it)
-
+            if(it != null)
+                genre_current.text = resources.getString(R.string.chosen_genre, it)
         })
 
         genres_recycler.layoutManager = LinearLayoutManager(view?.context)
         genres_recycler.adapter = adapter
-        genre_current.text = resources.getString(R.string.chosen_genre, genreViewModel.genreText.value)
-
     }
 }

@@ -11,8 +11,8 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
+import com.kalk.jmr.SpotifyCommands
 import com.kalk.jmr.getPlaylistRepository
 import com.kalk.jmr.ui.SwipeToDeleteCallback
 import kotlinx.android.synthetic.main.history_fragment.*
@@ -24,7 +24,7 @@ class HistoryFragment : Fragment() {
         fun newInstance() = HistoryFragment()
     }
 
-    private lateinit var playCommands: PlayCommands
+    private lateinit var playCommands: SpotifyCommands
     private lateinit var historyViewModel:HistoryViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +36,7 @@ class HistoryFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        playCommands = context as PlayCommands
+        playCommands = context as SpotifyCommands
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

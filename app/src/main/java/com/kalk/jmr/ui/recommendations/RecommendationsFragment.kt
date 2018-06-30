@@ -1,16 +1,16 @@
 package com.kalk.jmr.ui.recommendations
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
+import com.kalk.jmr.SpotifyCommands
 import com.kalk.jmr.getGenreRepository
 import com.kalk.jmr.getPlaylistRepository
 import com.kalk.jmr.ui.genres.GenresViewModel
@@ -18,19 +18,17 @@ import com.kalk.jmr.ui.genres.GenresViewModelFactory
 import com.kalk.jmr.ui.settings.SettingsViewModel
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.recommendations_fragment.*
-import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
 import java.util.*
 
 
 class RecommendationsFragment : Fragment() {
+
     companion object {
         fun newInstance() = RecommendationsFragment()
         val TAG = RecommendationsFragment::class.java.simpleName
     }
 
-    private lateinit var playCommands: PlayCommands
+    private lateinit var playCommands: SpotifyCommands
     private lateinit var recommendationsViewModel: RecommendationsViewModel
     private lateinit var settings: SettingsViewModel
     private lateinit var genreViewModel: GenresViewModel
@@ -45,9 +43,10 @@ class RecommendationsFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        playCommands = context as PlayCommands
+        playCommands = context as SpotifyCommands
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -74,13 +73,13 @@ class RecommendationsFragment : Fragment() {
                 getPlaylistRepository(activity!!.applicationContext)))
                 .get(RecommendationsViewModel::class.java)
 
+        recommendations_chosen_genre.text = "Choose a genre"
         genreViewModel.genreText.observe( viewLifecycleOwner, Observer {
             recommendations_chosen_genre.text = resources.getString(R.string.chosen_genre, it) })
 
         recommendationsViewModel.currentActivityText.observe(viewLifecycleOwner, Observer {
             recommendations_activity.text = resources.getString(R.string.current_activity, it)
         })
-
 
         recommendationsViewModel.currentLocationText.observe(viewLifecycleOwner, Observer {
             recommendations_location.text = resources.getString(R.string.current_location, it)
@@ -89,27 +88,13 @@ class RecommendationsFragment : Fragment() {
         recommendations_time.text = resources.getString(R.string.current_time, Date().toString().substring(0, 16))
 
         button_recommend?.setOnClickListener {
-
             it.isEnabled = false
-
-            if(genreViewModel.chosenGenre.value != null && genreViewModel.genreText.value != null ) {
-                val id = genreViewModel.chosenGenre.value!!
-                val text = genreViewModel.genreText.value!!
-                snackbar(this@RecommendationsFragment.view!!, "Retrieving tracks recommendation with ${text}")
-
-                doAsync {
-                    val recommendation = recommendationsViewModel.makeRecommendation(text)
-                    if(recommendation.isNotEmpty()) {
-                        playCommands.play(recommendation.map { it.uri })
-                        recommendationsViewModel.storePlaylist(id, recommendation)
-                    }
-                }
-
-                it.isEnabled = true
-
-            } else {
-                snackbar(this.view!!, "Please choose a genre")
-            }
+            playCommands.requestAuthToken()
+                val fm = fragmentManager
+                val hdf= RecommendationsDialogFragment
+                        .newInstance()
+                hdf.show(fm, "recommendations_dialog_fragment")
+            it.isEnabled = true
         }
     }
 }

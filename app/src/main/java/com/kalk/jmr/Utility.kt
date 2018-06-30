@@ -52,7 +52,7 @@ fun getPlaylistRepository(context: Context): PlaylistRepository {
 const val fiftyFiveMinutes = 3_300_000L
 fun shouldRequestNewToken(token: Token, currentTime: Long): Boolean {
     when {
-        token.token.isEmpty() -> return true
+        token.token == "" -> return true
         currentTime.minus(token.timestamp) < fiftyFiveMinutes -> return false
         else -> return true
     }

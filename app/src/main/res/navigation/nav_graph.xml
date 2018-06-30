@@ -41,4 +41,8 @@
         android:name="com.kalk.jmr.ui.genres.GenresFragment"
         android:label="genres_fragment"
         tools:layout="@layout/genres_fragment" />
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.kalk.jmr.ui.AboutFragment"
+        android:label="AboutFragment" />
 </navigation>
