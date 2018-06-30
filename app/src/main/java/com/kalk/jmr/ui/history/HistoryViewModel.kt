@@ -14,4 +14,6 @@ class HistoryViewModel internal constructor(private val repo: PlaylistRepository
     fun getTracksFromPlaylistId(id:String) = repo.getTracksFromPlaylistId(id)
 
     fun removePlaylist(id:String) = repo.removePlaylist(id)
+
+    fun removeTrackFromPlaylist(playlistId:String ,trackUri:String) = repo.removeTrackFromPlaylist(playlistId,trackUri)
 }

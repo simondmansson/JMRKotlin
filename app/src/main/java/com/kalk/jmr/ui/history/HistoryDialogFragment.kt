@@ -1,18 +1,13 @@
 package com.kalk.jmr.ui.history
 
-import android.app.Dialog
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.support.v4.app.DialogFragment
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
 import com.kalk.jmr.db.track.Track
@@ -28,8 +23,10 @@ class HistoryDialogFragment: DialogFragment() {
 
     companion object {
         val TAG = HistoryDialogFragment::class.java.simpleName
-        fun newInstance(list: ArrayList<Track>) = HistoryDialogFragment().apply {
+        fun newInstance(playlistTitle:String, playlistId:String, list: ArrayList<Track>) = HistoryDialogFragment().apply {
             val args = Bundle().apply {
+                putString("playlistTitle", playlistTitle)
+                putString("playlistId", playlistId)
                 putParcelableArrayList("list", list)
             }
             this.arguments = args
@@ -50,18 +47,15 @@ class HistoryDialogFragment: DialogFragment() {
         return inflater.inflate(R.layout.history_dialog_fragment, container, false)
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return super.onCreateDialog(savedInstanceState)
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val tracks = arguments?.get("list")
+        val playlistId = arguments!!.getString("playlistId")
         val adapter = HistoryDialogFragmentAdapter(tracks as ArrayList<Track>) { type, track ->
             when(type) {
                 0 -> {
                     doAsync {
-                        //historyViewModel remove track from pl, we also need to bundle playlist title and id
+                        historyViewModel.removeTrackFromPlaylist(playlistId, track.uri)
                     }
                 }
                 1 -> {
@@ -72,6 +66,7 @@ class HistoryDialogFragment: DialogFragment() {
             }
         }
 
+        history_dialog_title.text =  arguments?.getString("playlistTitle") ?: "Tracks"
         history_dialog_recycler.layoutManager = LinearLayoutManager(parentFragment?.context)
         history_dialog_recycler.adapter = adapter
     }

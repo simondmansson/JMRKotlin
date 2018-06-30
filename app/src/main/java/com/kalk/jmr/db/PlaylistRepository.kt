@@ -39,6 +39,12 @@ class PlaylistRepository private constructor(private val trackDao: TrackDao,
         }
     }
 
+    fun removeTrackFromPlaylist(playlistId:String ,trackUri:String) {
+        ioThread {
+            playlistTracksDao.removePlaylistTrack(PlaylistTrack(playlistId, trackUri))
+        }
+    }
+
     fun requestTracksFromGenre(token:String, genre: String): List<Track> {
         val message = GenreMessage(token, genre.decapitalize())
         Log.i(TAG, message.toString())

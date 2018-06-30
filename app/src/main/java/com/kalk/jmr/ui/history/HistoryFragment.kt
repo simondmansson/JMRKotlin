@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -12,16 +11,12 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.Navigation
-import androidx.navigation.ui.NavigationUI
-import com.google.android.gms.common.GooglePlayServicesUtil
 import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
 import com.kalk.jmr.getPlaylistRepository
 import com.kalk.jmr.ui.SwipeToDeleteCallback
 import kotlinx.android.synthetic.main.history_fragment.*
 import kotlinx.android.synthetic.main.main_activity.*
-import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.doAsync
 
 class HistoryFragment : Fragment() {
@@ -63,10 +58,10 @@ class HistoryFragment : Fragment() {
                 1-> {
                     doAsync {
                        val playlistTracks =  historyViewModel.getTracksFromPlaylistId(playlist.id)
-                        snackbar(this@HistoryFragment.view!!, "Loading tracks")
                         val arrayList = ArrayList(playlistTracks)
                         val fm = fragmentManager
-                        val hdf= HistoryDialogFragment.newInstance(arrayList)
+                        val hdf= HistoryDialogFragment
+                                .newInstance(playlist.title, playlist.id, arrayList)
                         hdf.show(fm, "history_dialog_fragment")
                     }
                 }

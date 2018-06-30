@@ -38,6 +38,7 @@ import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
 import kotlinx.android.synthetic.main.main_activity.*
+import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.toast
 import java.util.*
 
@@ -201,10 +202,27 @@ class MainActivity : AppCompatActivity(), PlayCommands {
 
     override fun play(uris: List<String>) {
         Log.i(TAG, "Songs to play ${uris.size}")
+
         if (mSpotifyAppRemote.isConnected) {
-            mSpotifyAppRemote.playerApi.play(uris[0])
-            for (song in 1 until uris.size) {
-                mSpotifyAppRemote.playerApi.queue(uris[song])
+            val playerState = mSpotifyAppRemote.playerApi.playerState.await()
+            if(playerState.isSuccessful) {
+                when {
+                    playerState.data.isPaused -> {
+                        mSpotifyAppRemote.playerApi.play(uris[0])
+                        for (song in 1 until uris.size) {
+                            mSpotifyAppRemote.playerApi.queue(uris[song])
+                        }
+
+                        longSnackbar(this@MainActivity.view_pager_main,
+                                "Playing track${if(uris.size > 1) "s" else ""}")
+                    }
+                    else -> {
+                        for (song in 0 until uris.size) {
+                            mSpotifyAppRemote.playerApi.queue(uris[song])
+                        }
+                        longSnackbar(this@MainActivity.view_pager_main, "Queueing tracks")
+                    }
+                }
             }
         }
     }
