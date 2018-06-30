@@ -3,6 +3,7 @@ package com.kalk.jmr.db.playlistTracks
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
+import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.kalk.jmr.db.track.Track
 
@@ -13,8 +14,8 @@ interface PlaylistTracksDao {
     fun findTracksbyId(playlist: String) :List<Track>
 
     @Query("Select * from playlistTracks")
-    fun selectAll(): LiveData<List<PlaylistTrack>>
+    fun selectAll(): List<PlaylistTrack>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addPlaylistTrack(playlistTrack: PlaylistTrack)
 }

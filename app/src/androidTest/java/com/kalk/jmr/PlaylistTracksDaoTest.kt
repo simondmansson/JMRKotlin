@@ -38,6 +38,6 @@ class PlaylistTracksDaoTest {
         val pl = pldao.findTracksbyId("UUID")
         assertEquals(pl.size, 1)
         assertEquals(pl[0].uri, track.uri)
-        assertEquals(pl[0].title, track.title)
+        assertEquals(pl[0].name, track.name)
     }
 }

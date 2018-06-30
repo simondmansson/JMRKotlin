@@ -23,6 +23,7 @@ import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.location.Coordinates
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.enums.ActivityBroadcast
+import com.kalk.jmr.enums.ValidActivity
 import com.kalk.jmr.enums.validAcitvityBuilder
 import com.kalk.jmr.ui.genres.GenresViewModel
 import com.kalk.jmr.ui.genres.GenresViewModelFactory
@@ -72,16 +73,14 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                         getPlaylistRepository(applicationContext)))
                 .get(RecommendationsViewModel::class.java)
 
+        recommendationsViewModel.setActivity(validAcitvityBuilder(ValidActivity.STILL.title)) //setActiviy to still on startup
+
         genreViewModel = ViewModelProviders.of(this,
                 GenresViewModelFactory(
                         getGenreRepository(applicationContext)))
                 .get(GenresViewModel::class.java)
 
         genreViewModel.chosenGenre.value = preferences.getInt(CHOSEN_GENRE, 0)
-
-        genreViewModel.genreText.observe(this, android.arch.lifecycle.Observer {
-            toast(it ?: "null")
-        })
 
         with(settings) {
             activity.value = preferences.getBoolean(SWITCH_ACTIVITY, true)
@@ -147,7 +146,8 @@ class MainActivity : AppCompatActivity(), PlayCommands {
                     val confidence = intent.getIntExtra(ActivityBroadcast.ACTIVITY_CONFIDENCE.name, 0)
                     val type = intent.getStringExtra(ActivityBroadcast.DETECTED_ACTIVITY.name)
                     Log.i(TAG, "received $type with confidence $confidence")
-                    recommendationsViewModel.setActivity(validAcitvityBuilder(type))
+                    if(confidence > 75)
+                        recommendationsViewModel.setActivity(validAcitvityBuilder(type))
                 }
             }
         }
@@ -173,6 +173,7 @@ class MainActivity : AppCompatActivity(), PlayCommands {
             apply()
         }
         mActivityRecognitionClient.removeActivityUpdates(getActivityDetectionPendingIntent())
+
     }
 
     override fun onStop() {
@@ -199,13 +200,13 @@ class MainActivity : AppCompatActivity(), PlayCommands {
     override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
 
     override fun play(uris: List<String>) {
+        Log.i(TAG, "Songs to play ${uris.size}")
         if (mSpotifyAppRemote.isConnected) {
             mSpotifyAppRemote.playerApi.play(uris[0])
             for (song in 1 until uris.size) {
                 mSpotifyAppRemote.playerApi.queue(uris[song])
             }
         }
-
     }
 
     //thanks google

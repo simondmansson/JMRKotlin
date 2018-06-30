@@ -10,8 +10,8 @@ interface TrackDao {
     fun byUri(uri: String): Track
 
     @Query("Select * from tracks")
-    fun allTracks(): LiveData<List<Track>>
+    fun allTracks(): List<Track>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addTrack(track: Track)
 }

@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,8 @@ import com.kalk.jmr.ui.settings.SettingsViewModel
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.recommendations_fragment.*
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
 import java.util.*
 
 
@@ -71,41 +74,42 @@ class RecommendationsFragment : Fragment() {
                 getPlaylistRepository(activity!!.applicationContext)))
                 .get(RecommendationsViewModel::class.java)
 
-        genreViewModel.genreText.observe( this, Observer {
+        genreViewModel.genreText.observe( viewLifecycleOwner, Observer {
             recommendations_chosen_genre.text = resources.getString(R.string.chosen_genre, it) })
 
-        recommendationsViewModel.currentActivityText.observe(this, Observer {
+        recommendationsViewModel.currentActivityText.observe(viewLifecycleOwner, Observer {
             recommendations_activity.text = resources.getString(R.string.current_activity, it)
         })
 
 
-        recommendationsViewModel.currentLocationText.observe(this, Observer {
+        recommendationsViewModel.currentLocationText.observe(viewLifecycleOwner, Observer {
             recommendations_location.text = resources.getString(R.string.current_location, it)
         })
 
         recommendations_time.text = resources.getString(R.string.current_time, Date().toString().substring(0, 16))
 
-
-
         button_recommend?.setOnClickListener {
+
+            it.isEnabled = false
+
             if(genreViewModel.chosenGenre.value != null && genreViewModel.genreText.value != null ) {
                 val id = genreViewModel.chosenGenre.value!!
                 val text = genreViewModel.genreText.value!!
-                recommendationsViewModel.makeRecommendation(text)
+                snackbar(this@RecommendationsFragment.view!!, "Retrieving tracks recommendation with ${text}")
 
-                recommendationsViewModel.tracks.observe(this, Observer{
-                    val songs = it?.map { it.uri }
-                    if(songs != null) {
-                        playCommands.play(songs)
-                        recommendationsViewModel.addPlaylist(id, it)
+                doAsync {
+                    val recommendation = recommendationsViewModel.makeRecommendation(text)
+                    if(recommendation.isNotEmpty()) {
+                        playCommands.play(recommendation.map { it.uri })
+                        recommendationsViewModel.storePlaylist(id, recommendation)
                     }
-                })
+                }
+
+                it.isEnabled = true
 
             } else {
                 snackbar(this.view!!, "Please choose a genre")
             }
-
         }
-
     }
 }

@@ -68,7 +68,7 @@ fun shouldRequestNewLocation(location: UserLocation, savedTime:Long, currentTime
     }
 }
 
-fun  buildJMRWebService(): JMRWebService {
+fun  buildJMRWebService(baseUrl:String = "https://jmr-backend.herokuapp.com" ): JMRWebService {
     val okHttpClient = OkHttpClient.Builder()
     okHttpClient.connectTimeout(60, TimeUnit.SECONDS)
     okHttpClient.readTimeout(60, TimeUnit.SECONDS)
@@ -76,7 +76,7 @@ fun  buildJMRWebService(): JMRWebService {
     okHttpClient.retryOnConnectionFailure(true)
 
     val retrofit =  Retrofit.Builder()
-            .baseUrl("https://jmr-backend.herokuapp.com")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient.build())
             .build()

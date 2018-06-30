@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -11,15 +12,17 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.widget.toast
+import androidx.navigation.Navigation
+import androidx.navigation.ui.NavigationUI
+import com.google.android.gms.common.GooglePlayServicesUtil
 import com.kalk.jmr.PlayCommands
 import com.kalk.jmr.R
 import com.kalk.jmr.getPlaylistRepository
 import com.kalk.jmr.ui.SwipeToDeleteCallback
 import kotlinx.android.synthetic.main.history_fragment.*
 import kotlinx.android.synthetic.main.main_activity.*
-
+import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.doAsync
 
 class HistoryFragment : Fragment() {
     companion object {
@@ -43,15 +46,31 @@ class HistoryFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        historyViewModel = ViewModelProviders.of(this, HistoryViewModelFactory(
+        historyViewModel = ViewModelProviders.of(activity!!, HistoryViewModelFactory(
                 getPlaylistRepository(activity!!.applicationContext)))
                 .get(HistoryViewModel::class.java)
 
-        val adapter =  PlaylistAdapter(historyViewModel.playlists.value ?: listOf()) {
+        val adapter = PlaylistAdapter(historyViewModel.playlists.value ?: listOf()) { type, playlist ->
+            when(type) {
+                0 -> {
+                    doAsync {
+                       val tracks = historyViewModel.getTracksFromPlaylistId(playlist.id)
+                        val uris = tracks.map { it.uri }
+                        playCommands.play(uris)
+                    }
+                }
 
-            val songs = it.uri.map { it.uri }
-            context?.toast("${it.title} Clicked ${songs.size}", Toast.LENGTH_SHORT)
-            //playCommands.play(songs)
+                1-> {
+                    doAsync {
+                       val playlistTracks =  historyViewModel.getTracksFromPlaylistId(playlist.id)
+                        snackbar(this@HistoryFragment.view!!, "Loading tracks")
+                        val arrayList = ArrayList(playlistTracks)
+                        val fm = fragmentManager
+                        val hdf= HistoryDialogFragment.newInstance(arrayList)
+                        hdf.show(fm, "history_dialog_fragment")
+                    }
+                }
+            }
         }
 
         history_recycler.layoutManager = LinearLayoutManager(context)
@@ -65,12 +84,13 @@ class HistoryFragment : Fragment() {
                 }
             }
         }
+
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(history_recycler)
 
-        historyViewModel.playlists.observe(this, Observer(function = {
+        historyViewModel.playlists.observe(viewLifecycleOwner, Observer {
             adapter.updatePlayList(if (it != null) it else historyViewModel.playlists.value ?: listOf())
-        }))
+        })
 
     }
 }

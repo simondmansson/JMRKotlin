@@ -7,7 +7,7 @@ import android.arch.persistence.room.Query
 @Dao
 interface PlaylistDao {
     @Query ("Select * from playlists")
-    fun selectAll(): LiveData<List<Playlist>>
+    fun selectAll():LiveData<List<Playlist>>
 
     @Query ("Select * from playlists where genre = :genre")
     fun selectByGenre(genre: Int) :List<Playlist>
@@ -49,4 +49,5 @@ interface PlaylistDao {
 
     @Query("Delete from playlists where id = :id")
     fun removePlaylist(id: String)
+
 }

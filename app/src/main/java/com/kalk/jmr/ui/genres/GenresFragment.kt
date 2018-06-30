@@ -38,9 +38,9 @@ class GenresFragment : Fragment() {
             context?.toast("${genreViewModel.genreText.value} chosen")
         }
 
-        genreViewModel.genres.observe( this, Observer { adapter.updateGenres(it ?: listOf()) })
+        genreViewModel.genres.observe(viewLifecycleOwner, Observer { adapter.updateGenres(it ?: listOf()) })
 
-        genreViewModel.genreText.observe( this, Observer {
+        genreViewModel.genreText.observe(viewLifecycleOwner, Observer {
             genre_current.text = resources.getString(R.string.chosen_genre, it)
 
         })

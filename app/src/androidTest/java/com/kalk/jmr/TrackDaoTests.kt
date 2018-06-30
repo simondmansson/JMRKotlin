@@ -36,7 +36,7 @@ class TrackDaoTests {
         dao.addTrack(track)
         val queryResult = dao.byUri(track.uri)
         assertEquals( track.uri, queryResult.uri)
-        assertEquals(track.title, queryResult.title)
+        assertEquals(track.name, queryResult.name)
     }
 
     @Test
@@ -47,10 +47,10 @@ class TrackDaoTests {
         dao.addTrack(track2)
         val queryResult = dao.byUri(track.uri)
         assertEquals(track.uri, queryResult.uri)
-        assertEquals(track.title, queryResult.title)
+        assertEquals(track.name, queryResult.name)
         val queryResult2 = dao.byUri(track2.uri)
         assertEquals(track.uri, queryResult2.uri)
-        assertEquals(track.title, queryResult2.title)
+        assertEquals(track.name, queryResult2.name)
     }
 
 }

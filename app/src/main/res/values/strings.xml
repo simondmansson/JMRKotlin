@@ -18,5 +18,6 @@
     <string name="history">history</string>
     <string name="home">home</string>
     <string name="genres">genres</string>
+    <string name="tracks">Tracks</string>
 
 </resources>

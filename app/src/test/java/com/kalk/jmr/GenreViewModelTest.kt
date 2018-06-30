@@ -10,6 +10,7 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,10 +18,10 @@ import org.junit.rules.TestRule
 
 class GenreViewModelTest {
 
-    val repo = mock<GenreRepository>()
-    lateinit var liveData:MutableLiveData<List<Genre>>
+    private val repo = mock<GenreRepository>()
+    private lateinit var liveData:MutableLiveData<List<Genre>>
     private lateinit var genreViewModel: GenresViewModel
-    val genreList = listOf(Genre(1, "rock"), Genre(2, "pop"))
+    private val genreList = listOf(Genre(1, "rock"), Genre(2, "pop"))
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule() //we need this for testing live data
@@ -39,7 +40,7 @@ class GenreViewModelTest {
         genreViewModel = GenresViewModel(repo)
         val observer = mock<Observer<List<Genre>>>()
         genreViewModel.genres.observeForever(observer)
-        Assert.assertEquals(2, genreViewModel.genres.value?.size)
+        assertEquals(2, genreViewModel.genres.value?.size)
     }
 
     @Test
@@ -50,8 +51,8 @@ class GenreViewModelTest {
         genreViewModel.genres.observeForever(observer) //have to observe this as well for genreText change to trigger?
         genreViewModel.genreText.observeForever(textObserver)
         genreViewModel.chosenGenre.value = 1
-        Assert.assertEquals("Pop", genreViewModel.genreText.value) //Big P since we capitalize
+        assertEquals("Pop", genreViewModel.genreText.value) //Big P since we capitalize
         genreViewModel.chosenGenre.value = 0
-        Assert.assertEquals("Rock", genreViewModel.genreText.value) //Big P since we capitalize
+        assertEquals("Rock", genreViewModel.genreText.value) //Big P since we capitalize
     }
 }

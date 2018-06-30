@@ -1,11 +1,13 @@
 package com.kalk.jmr.ui.history
 
+import android.arch.lifecycle.ViewModelProviders
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.kalk.jmr.R
 import com.kalk.jmr.db.playlist.HistoryPlaylist
+import com.kalk.jmr.db.playlist.Playlist
 import kotlinx.android.synthetic.main.playlist_card_view.view.*
 
 /**
@@ -13,7 +15,7 @@ import kotlinx.android.synthetic.main.playlist_card_view.view.*
  * @param playlists List of @class Playlist
  * @param listener
  */
-class PlaylistAdapter(private var playlists: List<HistoryPlaylist>, val listener: (HistoryPlaylist) -> Unit) :
+class PlaylistAdapter(private var playlists: List<Playlist>, val listener: (type:Int, Playlist) -> Unit) :
         RecyclerView.Adapter<PlaylistAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,23 +29,28 @@ class PlaylistAdapter(private var playlists: List<HistoryPlaylist>, val listener
     override fun getItemCount() = playlists.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(playlist: HistoryPlaylist, listener: (HistoryPlaylist) -> Unit) = with(itemView) {
+        fun bind(playlist: Playlist, listener: (type:Int, Playlist) -> Unit) = with(itemView) {
             _playlist_card_title.text = playlist.title
             playlist_button_card.setOnClickListener {
                 view ->
-                listener.invoke(playlist)
+                listener.invoke(0,playlist)
+            }
+
+            tracklist_button_card.setOnClickListener {
+                view ->
+                listener.invoke(1, playlist)
             }
 
         }
     }
 
-    fun removeAt(position: Int, listener: (HistoryPlaylist) -> Unit) {
+    fun removeAt(position: Int, listener: (Playlist) -> Unit) {
         val pl = playlists.get(index = position)
         listener.invoke(pl)
         playlists = playlists.filterIndexed { index, historyPlaylist -> index != position  }
         notifyItemRemoved(position)
     }
-    fun updatePlayList(newlists: List<HistoryPlaylist>) {
+    fun updatePlayList(newlists: List<Playlist>) {
         playlists = newlists
         notifyDataSetChanged()
     }

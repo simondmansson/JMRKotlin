@@ -1,11 +1,8 @@
 package com.kalk.jmr.db
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.util.Log
 import com.kalk.jmr.buildJMRWebService
-import com.kalk.jmr.db.playlist.HistoryPlaylist
 import com.kalk.jmr.db.playlist.Playlist
 import com.kalk.jmr.db.playlist.PlaylistDao
 import com.kalk.jmr.db.playlistTracks.PlaylistTrack
@@ -14,46 +11,27 @@ import com.kalk.jmr.db.track.Track
 import com.kalk.jmr.db.track.TrackDao
 import com.kalk.jmr.ioThread
 import com.kalk.jmr.webService.GenreMessage
-import com.kalk.jmr.webService.SpotifyTrack
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.kalk.jmr.webService.JMRWebService
 
-class PlaylistRepository private constructor(val trackDao: TrackDao, val playlistTracksDao: PlaylistTracksDao, val playlistDao: PlaylistDao) {
+class PlaylistRepository private constructor(private val trackDao: TrackDao,
+                                             private val playlistTracksDao: PlaylistTracksDao,
+                                             private val playlistDao: PlaylistDao) {
 
-    private var storedPlaylists = playlistDao.selectAll()
-    private var storedTracks = trackDao.allTracks()
-    private var storedPlaylistTracks = playlistTracksDao.selectAll()
-    private val service = buildJMRWebService()
-    private val tracksToQueue: MutableLiveData<List<Track>> = MutableLiveData()
-    val TracksToPlay: LiveData<List<Track>> = Transformations.map(tracksToQueue, { it })
 
-    private val playlists: LiveData<List<HistoryPlaylist>> = Transformations.map(storedPlaylists, {
-        it.map { playlist ->
-            val songsUris = storedPlaylistTracks.value?.filter { playlist.id == it.playlist }
-            val songs: MutableList<Track> = mutableListOf()
-            songsUris?.forEach {plTrack ->
-                val track = storedTracks.value?.find { it.uri == plTrack.track }
-                if (track != null)
-                    songs.add(track)
-            }
-            HistoryPlaylist(playlist.id ,playlist.title, songs)
-        }
-    })
+    val trackCount: MutableLiveData<Int> = MutableLiveData()
+    val storedPlaylists = playlistDao.selectAll()
+    private val service: JMRWebService
 
-    fun getPlaylists(): LiveData<List<HistoryPlaylist>> {
-        return playlists
-    }
-
-    fun storePlaylist(playlist: Playlist, tracks:List<Track>) {
+    init {
         ioThread {
-            playlistDao.addPlaylist(playlist)
-            tracks.forEach {
-                trackDao.addTrack(it)
-                playlistTracksDao.addPlaylistTrack(PlaylistTrack(playlist.id, it.uri))
-            }
+            Log.i(TAG, "stored tracks ${trackDao.allTracks()}")
+            Log.i(TAG, "playlistracks ${playlistTracksDao.selectAll()}")
+            Log.i(TAG, "stored tracks ${playlistDao.selectAll()}")
         }
+        service = buildJMRWebService()
     }
+
+    fun getTracksFromPlaylistId(id: String) = playlistTracksDao.findTracksbyId(id)
 
     fun removePlaylist(id:String){
         ioThread {
@@ -61,33 +39,28 @@ class PlaylistRepository private constructor(val trackDao: TrackDao, val playlis
         }
     }
 
-
-    fun requestTracks(token:String, genre: String)  {
+    fun requestTracksFromGenre(token:String, genre: String): List<Track> {
         val message = GenreMessage(token, genre.decapitalize())
         Log.i(TAG, message.toString())
-        ioThread {
-            val callback = object : Callback<List<Track>> {
-                override fun onResponse(call: Call<List<Track>>?, response: Response<List<Track>>?) {
-                    Log.i(TAG, response?.toString())
-                    Log.i(TAG, response?.raw()?.headers().toString())
-                    Log.i(TAG, "body: ${response?.body()}")
-                    Log.i(TAG, call?.isExecuted.toString())
-                    Log.i(TAG, call?.request().toString())
-                    Log.i(TAG, call?.request()?.body().toString())
-
-                    if (response!!.isSuccessful) {
-                        val songs = response.body()
-                        tracksToQueue.postValue(songs!!)
-                    }
-                }
-
-                override fun onFailure(call: Call<List<Track>>?, t: Throwable?) {
-                    Log.e(TAG, "Could not retrieve tracks")
-                }
-            }
-            val req = service.postRecommendationGenre(message).enqueue(callback)
+        val res = service.postRecommendationGenre(message).execute()
+        if(res.isSuccessful && res.body() != null) {
+            val tracks = res.body()
+            return tracks!!
+        } else  {
+            Log.e(TAG, " Retrieving from genre failed. Error msg: ${res.errorBody().toString()} ${res.code()}")
         }
+        return listOf()
+    }
 
+   fun storePlaylist(playlist: Playlist, tracks:List<Track>) {
+        ioThread {
+            Log.i(TAG, "adding ${playlist.title}  with # of tracks ${tracks.size}")
+            tracks.forEach {
+                trackDao.addTrack(it)
+                playlistTracksDao.addPlaylistTrack(PlaylistTrack(playlist.id, it.uri))
+            }
+            playlistDao.addPlaylist(playlist)
+        }
     }
 
     companion object {
