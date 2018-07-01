@@ -27,7 +27,8 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             android:textColor="@color/white"
             android:textAlignment="center"
-            android:paddingTop="@dimen/start_padding"/>
+            android:paddingTop="@dimen/start_padding"
+            android:elevation="32dp"/>
 
     </android.support.design.card.MaterialCardView>
 

@@ -20,6 +20,8 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.gson.Gson
+import com.google.gson.JsonIOException
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.location.Coordinates
 import com.kalk.jmr.db.location.UserLocation
@@ -30,6 +32,7 @@ import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModelFactory
 import com.kalk.jmr.ui.recommendations.Token
 import com.kalk.jmr.ui.settings.SettingsViewModel
+import com.kalk.jmr.webService.GoogleLocationResult
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
@@ -40,6 +43,7 @@ import kotlinx.android.synthetic.main.main_activity.*
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
+import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
@@ -83,13 +87,11 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
         }
 
         mActivityRecognitionClient = ActivityRecognition.getClient(this)
-        if (settings.activity.value!!)
-            mActivityRecognitionClient.requestActivityUpdates(30 * 1000, getActivityDetectionPendingIntent())
-
+        mActivityRecognitionClient.requestActivityUpdates(30 * 1000, getActivityDetectionPendingIntent())
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         val storedUserLocation = recommendationsViewModel.currentLocation.value
-                ?: UserLocation("", Coordinates(0.0, 0.0))
+                ?: UserLocation("", "", Coordinates(0.0, 0.0))
 
         if (shouldRequestNewLocation(storedUserLocation, preferences.getLong(LOCATION_TIMESTAMP, Long.MAX_VALUE), System.currentTimeMillis()))
             getLatestKnownLocation()
@@ -103,8 +105,8 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
             requestAuthToken()
 
             connectionParams = ConnectionParams.Builder(CLIENT_ID)
-                    .setRedirectUri(REDIRECT_URI)
                     .showAuthView(true)
+                    .setRedirectUri(REDIRECT_URI)
                     .build()
 
             val connectionListener = object : Connector.ConnectionListener {
@@ -145,12 +147,15 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
     override fun onPause() {
         super.onPause()
         with(preferences.edit()) {
-            putBoolean(SWITCH_ACTIVITY, settings.activity.value ?: true)
-            putBoolean(SWITCH_LOCATION, settings.location.value ?: true)
-            putBoolean(SWITCH_TIME, settings.time.value ?: true)
-            putLong(TOKEN_TIMESTAMP, recommendationsViewModel.authToken.value?.timestamp
-                    ?: Long.MAX_VALUE)
-            putString(TOKEN_STRING, recommendationsViewModel.authToken.value?.token)
+            settings.apply {
+                putBoolean(SWITCH_ACTIVITY, activity.value ?: true)
+                putBoolean(SWITCH_LOCATION, location.value ?: true)
+                putBoolean(SWITCH_TIME, time.value ?: true)
+            }
+            recommendationsViewModel.apply {
+                putLong(TOKEN_TIMESTAMP, authToken.value?.timestamp ?: Long.MAX_VALUE)
+                putString(TOKEN_STRING, authToken.value?.token)
+            }
             apply()
         }
         mActivityRecognitionClient.removeActivityUpdates(getActivityDetectionPendingIntent())
@@ -183,25 +188,26 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
 
     override fun play(uris: List<String>) {
         Log.i(TAG, "Songs to play ${uris.size}")
-        if (mSpotifyAppRemote.isConnected) {
-            val playerState = mSpotifyAppRemote.playerApi.playerState.await()
-            if(playerState.isSuccessful) {
-                when {
-                    playerState.data.isPaused -> {
-                        mSpotifyAppRemote.playerApi.play(uris[0])
-                        for (song in 1 until uris.size) {
-                            mSpotifyAppRemote.playerApi.queue(uris[song])
+            mSpotifyAppRemote.apply {
+            if (isConnected) {
+                val playerState = playerApi.playerState.await()
+                if(playerState.isSuccessful) {
+                    when {
+                        playerState.data.isPaused -> {
+                            playerApi.play(uris[0])
+                            for (song in 1 until uris.size) {
+                                playerApi.queue(uris[song])
+                            }
+                            longSnackbar(this@MainActivity.view_pager_main,
+                                    "Playing track${if(uris.size > 1) "s" else ""}")
                         }
-
-                        longSnackbar(this@MainActivity.view_pager_main,
-                                "Playing track${if(uris.size > 1) "s" else ""}")
-                    }
-                    else -> {
-                        for (song in 0 until uris.size) {
-                            mSpotifyAppRemote.playerApi.queue(uris[song])
+                        else -> {
+                            for (song in 0 until uris.size) {
+                                playerApi.queue(uris[song])
+                            }
+                            longSnackbar(this@MainActivity.view_pager_main,
+                                    "Queueing track${if(uris.size > 1) "s" else ""}")
                         }
-                        longSnackbar(this@MainActivity.view_pager_main,
-                                "Queueing track${if(uris.size > 1) "s" else ""}")
                     }
                 }
             }
@@ -210,11 +216,16 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
 
     override fun requestAuthToken() {
         //If recommendationsViewModel have a token it will be used. Else we get it from preferences or default value
-        val token = if(recommendationsViewModel.authToken.value != null) recommendationsViewModel.authToken.value!! else Token(preferences.getString(TOKEN_STRING, ""), preferences.getLong(TOKEN_TIMESTAMP, Long.MAX_VALUE))
+        val token =   if(recommendationsViewModel.authToken.value != null)
+                                recommendationsViewModel.authToken.value!!
+                            else Token(preferences.getString(TOKEN_STRING, ""), preferences.getLong(TOKEN_TIMESTAMP, Long.MAX_VALUE))
 
 
         if(shouldRequestNewToken(token, System.currentTimeMillis())) {
-            val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
+            val builder = AuthenticationRequest.Builder(
+                                                    CLIENT_ID,
+                                                    AuthenticationResponse.Type.TOKEN,
+                                                    REDIRECT_URI)
             builder.setScopes(arrayOf("app-remote-control", "user-read-private", "streaming"))
             val request = builder.build()
             AuthenticationClient.openLoginActivity(this, 1442, request)
@@ -261,12 +272,10 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
     fun getLatestKnownLocation() {
         if (!hasPermissions(this, GPS_PERMISSIONS)) {
             Log.e(TAG, "no permission")
-            ActivityCompat.requestPermissions(this, GPS_PERMISSIONS,
-                    1337)
+            ActivityCompat.requestPermissions(this, GPS_PERMISSIONS, 1337)
         } else {
             Log.d(TAG, "Permissions previously granted")
             mFusedLocationProviderClient.lastLocation.addOnSuccessListener {
-                toast("long ${it.longitude} and lat ${it.latitude}")
                 doAsync {
                     val db = AppDatabase.getInstance(applicationContext)
                     val fromLong = it.longitude - 0.0001
@@ -277,23 +286,31 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
                     if (previousLocationInRange != null) {
                         recommendationsViewModel.setLocation(previousLocationInRange)
                     } else {
-                        val userLoc = UserLocation(UUID.randomUUID().toString(), Coordinates(it.longitude, it.latitude))
-                        recommendationsViewModel.setLocation(userLoc)
-                        db.locationDao().addLocation(userLoc)
+
+                        try {
+                            val service = buildGoogleApiService()
+                            val res = service.addressFromCoordinates("${it.latitude}, ${it.longitude}", "AIzaSyAjijhgnmvidgyjVXYNumXu4CH8_fPHzcc").execute()
+
+                            if(res.isSuccessful) {
+                                Log.i(TAG, "${res.body()}")
+                                val locs = res.body()!!
+                                Log.i(TAG, locs.results[1].formattedAddress)
+                                val symbolic = locs.results[1].addressComponent[0].short_name
+                                val userLoc = UserLocation(UUID.randomUUID().toString(), symbolic, Coordinates(it.longitude, it.latitude))
+                                db.locationDao().addLocation(userLoc)
+                                recommendationsViewModel.setLocation(userLoc)
+                            } else {
+                                Log.e(TAG, "Error retrieving location data: ${res.code()} ${res.errorBody()}")
+                            }
+                        } catch (e: IOException) {
+                            Log.e(TAG, e.message)
+                        }  catch (e: JsonIOException) {
+                            Log.e(TAG, e.message)
+                        } catch (e: Exception) {
+                            Log.e(TAG, e.message)
+                        }
                     }
-
-                    try {
-                        val geo = Geocoder(applicationContext, Locale.getDefault())
-
-                        val addresses = geo.getFromLocation(it.longitude, it.latitude,1)
-                        applicationContext.toast("address ${addresses[0].getAddressLine(0)}")
-                    } catch (e: IOException) {
-                        Log.e(TAG, e.message)
-                    }
-
                 }
-
-
             }
         }
     }

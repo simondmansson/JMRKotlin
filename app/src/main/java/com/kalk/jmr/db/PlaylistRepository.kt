@@ -41,17 +41,19 @@ class PlaylistRepository private constructor(private val trackDao: TrackDao,
     fun getPlaylistIdsFromContextParameters(location: String, activity: Int, time: Int): List<String> {
         Log.i(TAG, "Params: $location, $activity, $time")
         var ids: List<String> = listOf()
+        playlistDao.apply {
         when {
             //SINGLE PARAM
-            location.isNotEmpty() && activity == NOACTIVITY && time == NOTIME -> { ids = playlistDao.selectByLocation(location); Log.i(TAG, "LOCATION") }
-            location.isEmpty() && activity == NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByTime(time-1, time+1); Log.i(TAG, "TIME") }
-            location.isEmpty() && activity != NOACTIVITY && time == NOTIME -> { ids = playlistDao.selectByActivity(activity) ; Log.i(TAG, "ACTIVITY") }
+            location.isNotEmpty() && activity == NOACTIVITY && time == NOTIME -> { ids = selectByLocation(location); Log.i(TAG, "LOCATION") }
+            location.isEmpty() && activity == NOACTIVITY && time != NOTIME -> { ids = selectByTime(time-1, time+1); Log.i(TAG, "TIME") }
+            location.isEmpty() && activity != NOACTIVITY && time == NOTIME -> { ids = selectByActivity(activity) ; Log.i(TAG, "ACTIVITY") }
             //PAIR OF PARAMS
-            location.isNotEmpty() && activity == NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByLocationAndTime(location, time-1, time+1); Log.i(TAG, "LOCATION AND TIME")}
-            location.isNotEmpty() && activity != NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByLocationAndActivity(location, activity); Log.i(TAG, "LOCATION AND ACTIVITY") }
-            location.isEmpty() && activity != NOACTIVITY && time != NOTIME -> { ids = playlistDao.selectByActivityAndTime(activity, time-1, time+1); Log.i(TAG, "ACTIVITY AND TIME") }
+            location.isNotEmpty() && activity == NOACTIVITY && time != NOTIME -> { ids = selectByLocationAndTime(location, time-1, time+1); Log.i(TAG, "LOCATION AND TIME")}
+            location.isNotEmpty() && activity != NOACTIVITY && time == NOTIME -> { ids = selectByLocationAndActivity(location, activity); Log.i(TAG, "LOCATION AND ACTIVITY") }
+            location.isEmpty() && activity != NOACTIVITY && time != NOTIME -> { ids = selectByActivityAndTime(activity, time-1, time+1); Log.i(TAG, "ACTIVITY AND TIME") }
             //TRIO
-            location.isNotEmpty() && activity != -1 && time != -1 -> { ids = playlistDao.selectByLocationAndActivityAndTime(location, activity, time-1, time+1); Log.i(TAG, "ALL THREE")}
+            else-> { ids = selectByLocationAndActivityAndTime(location, activity, time-1, time+1); Log.i(TAG, "ALL THREE")}
+            }
         }
 
         return ids

@@ -13,4 +13,5 @@ import android.arch.persistence.room.PrimaryKey
 data class UserLocation(
         @PrimaryKey
         val id: String,
+        val symbolicLocation:String,
         @Embedded val coordinates: Coordinates)

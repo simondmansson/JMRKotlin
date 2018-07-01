@@ -25,5 +25,6 @@
     <string name="found_with_current_context">Found %d with current context</string>
     <string name="about">About</string>
     <string name="how_this_app_works">How this app works:</string>
+    <string name="choose_a_genre">Choose a genre</string>
 
 </resources>

@@ -21,7 +21,7 @@ class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
     val authToken: MutableLiveData<Token> = MutableLiveData()
 
     val currentLocationText: LiveData<String> = Transformations.map(currentLocation, {
-            "${it.coordinates.longitude} ${it.coordinates.latitude}"
+        it.symbolicLocation
     })
 
     fun setActivity(current: UserActivity) { currentActivity.value = current }
@@ -55,7 +55,7 @@ class RecommendationsViewModel(val repo: PlaylistRepository) : ViewModel() {
 
         val playlist = Playlist(
                 UUID.randomUUID().toString(),
-                "${currentActivityText.value} in ${currentLocationText.value}, ${dayOfWeek(day)} at $hourOfDay",
+                "${currentActivityText.value} in ${currentLocationText.value}, ${dayOfWeek(day)} at $hourOfDay o'clock",
                 currentLocation.value!!.id,
                 currentActivity.value!!.id,
                 genreId,

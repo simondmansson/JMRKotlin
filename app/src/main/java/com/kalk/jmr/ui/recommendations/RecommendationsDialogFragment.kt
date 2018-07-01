@@ -17,6 +17,7 @@ import com.kalk.jmr.ui.settings.SettingsViewModel
 import kotlinx.android.synthetic.main.recommendations_dialog_fragment.*
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
 
 class RecommendationsDialogFragment: DialogFragment() {
     private lateinit var playCommands: SpotifyCommands
@@ -84,7 +85,7 @@ class RecommendationsDialogFragment: DialogFragment() {
                     dismiss()
                 }
             } else {
-                snackbar(parentFragment?.view!!, "Please choose a genre")
+                context?.toast("Please choose a genre")
                 dismiss()
             }
         }

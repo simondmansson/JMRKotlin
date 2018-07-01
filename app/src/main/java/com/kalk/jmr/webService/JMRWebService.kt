@@ -14,7 +14,7 @@ interface JMRWebService {
     @POST("/recommendations/genre")
     fun postRecommendationGenre(@Body message: GenreMessage): Call<List<Track>>
 
-    @Headers("Accept: application/json")
+    @Headers("Accept: application/json", "Content-Type: application/json")
     @POST("/recommendations/history")
     fun postRecommendationHistory(@Body message: HistoryMessage): Call<List<Track>>
 

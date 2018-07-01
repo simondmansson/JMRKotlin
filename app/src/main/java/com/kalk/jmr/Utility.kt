@@ -11,6 +11,7 @@ import com.kalk.jmr.db.PlaylistRepository
 import com.kalk.jmr.db.genre.GenreRepository
 import com.kalk.jmr.db.location.UserLocation
 import com.kalk.jmr.ui.recommendations.Token
+import com.kalk.jmr.webService.GoogleLocationService
 import com.kalk.jmr.webService.JMRWebService
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -83,3 +84,20 @@ fun  buildJMRWebService(baseUrl:String = "https://jmr-backend.herokuapp.com" ): 
 
     return retrofit.create(JMRWebService::class.java)
 }
+
+fun  buildGoogleApiService(baseUrl:String = "https://maps.googleapis.com" ): GoogleLocationService {
+    val okHttpClient = OkHttpClient.Builder()
+    okHttpClient.connectTimeout(60, TimeUnit.SECONDS)
+    okHttpClient.readTimeout(60, TimeUnit.SECONDS)
+    okHttpClient.writeTimeout(60, TimeUnit.SECONDS)
+    okHttpClient.retryOnConnectionFailure(true)
+
+    val retrofit =  Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.build())
+            .build()
+
+    return retrofit.create(GoogleLocationService::class.java)
+}
+

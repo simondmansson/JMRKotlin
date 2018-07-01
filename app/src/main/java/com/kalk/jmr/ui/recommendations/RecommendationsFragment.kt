@@ -36,7 +36,7 @@ class RecommendationsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        toolbar_main_text?.text = resources.getString(R.string.toolbar_recommendations)
+
 
         return inflater.inflate(R.layout.recommendations_fragment, container, false)
     }
@@ -46,15 +46,15 @@ class RecommendationsFragment : Fragment() {
         playCommands = context as SpotifyCommands
     }
 
-    @SuppressLint("SetTextI18n")
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        toolbar_main_text?.text = resources.getString(R.string.toolbar_recommendations)
         /**
          * SETTINGS
          */
         settings = ViewModelProviders.of(activity!!).get(SettingsViewModel::class.java)
-
         settings.activity.observe(this, Observer {
             recommendations_activity.visibility = if(it!!) View.VISIBLE else View.GONE })
         settings.location.observe(this, Observer {
@@ -73,7 +73,7 @@ class RecommendationsFragment : Fragment() {
                 getPlaylistRepository(activity!!.applicationContext)))
                 .get(RecommendationsViewModel::class.java)
 
-        recommendations_chosen_genre.text = "Choose a genre"
+        recommendations_chosen_genre.text = getString(R.string.choose_a_genre)
         genreViewModel.genreText.observe( viewLifecycleOwner, Observer {
             recommendations_chosen_genre.text = resources.getString(R.string.chosen_genre, it) })
 
