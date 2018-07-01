@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.arch.lifecycle.ViewModelProviders
 import android.content.*
-import android.location.Geocoder
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.LocalBroadcastManager
@@ -20,7 +19,6 @@ import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.gson.Gson
 import com.google.gson.JsonIOException
 import com.kalk.jmr.db.AppDatabase
 import com.kalk.jmr.db.location.Coordinates
@@ -32,7 +30,6 @@ import com.kalk.jmr.ui.recommendations.RecommendationsViewModel
 import com.kalk.jmr.ui.recommendations.RecommendationsViewModelFactory
 import com.kalk.jmr.ui.recommendations.Token
 import com.kalk.jmr.ui.settings.SettingsViewModel
-import com.kalk.jmr.webService.GoogleLocationResult
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
@@ -42,9 +39,8 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse
 import kotlinx.android.synthetic.main.main_activity.*
 import org.jetbrains.anko.design.longSnackbar
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
-import org.json.JSONObject
 import java.io.IOException
+import java.lang.RuntimeException
 import java.util.*
 
 
@@ -163,10 +159,8 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
 
     override fun onStop() {
         super.onStop()
-        mSpotifyAppRemote.takeIf { mSpotifyAppRemote.isConnected }.apply {
-            SpotifyAppRemote.CONNECTOR.disconnect(mSpotifyAppRemote)
-        }
-
+        try { if (mSpotifyAppRemote.isConnected) SpotifyAppRemote.CONNECTOR.disconnect(mSpotifyAppRemote) }
+        catch (e:RuntimeException) { Log.e(TAG, e.message) }
         LocalBroadcastManager.getInstance(applicationContext).unregisterReceiver(mBroadcastReceiver)
     }
 
@@ -236,13 +230,6 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
 
     }
 
-    //thanks google
-    private fun getActivityDetectionPendingIntent(): PendingIntent {
-        val intent = Intent(this, ActivityRecognitionService::class.java)
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
 
@@ -269,7 +256,14 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
         }
     }
 
-    fun getLatestKnownLocation() {
+    //thanks google
+    private fun getActivityDetectionPendingIntent(): PendingIntent {
+        val intent = Intent(this, ActivityRecognitionService::class.java)
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    }
+
+    private fun getLatestKnownLocation() {
         if (!hasPermissions(this, GPS_PERMISSIONS)) {
             Log.e(TAG, "no permission")
             ActivityCompat.requestPermissions(this, GPS_PERMISSIONS, 1337)
