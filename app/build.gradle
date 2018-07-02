@@ -15,7 +15,6 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 
 android {
-
     signingConfigs {
         config {
             keyAlias keystoreProperties['keyAlias']
@@ -24,7 +23,6 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-
     compileSdkVersion rootProject.compileSdkVersion
     dataBinding {
         enabled = true
@@ -34,11 +32,18 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 3
+        versionName "1.0.2"
         vectorDrawables.useSupportLibrary true
+        signingConfig signingConfigs.config
     }
+
     buildTypes {
+
+        buildTypes.each {
+            it.buildConfigField 'String', 'GoogleAPIKEY', GoogleAPIKey
+        }
+
         debug {
             // Temporary workaround for Kotlin 1.2.50 and DataBinding bug. For more context see
             // https://issuetracker.google.com/issues/110198434 and
@@ -48,12 +53,10 @@ android {
                     task.dependsOn dataBindingExportFeaturePackageIdsDebug
                 }
             }
+            signingConfig signingConfigs.config
         }
-
         release {
-            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
             // Temporary workaround for Kotlin 1.2.50 and DataBinding bug. For more context see
             // https://issuetracker.google.com/issues/110198434 and
             // https://youtrack.jetbrains.com/issue/KT-24915#comment=27-2914947
@@ -62,15 +65,19 @@ android {
                     task.dependsOn dataBindingExportFeaturePackageIdsRelease
                 }
             }
+            signingConfig signingConfigs.config
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    productFlavors {
+    }
 }
 
 dependencies {
+
     //Spotify
     implementation project(':spotify-app-remote')
     implementation "com.spotify.android:auth:$rootProject.spotifyAuthVersion"
@@ -84,8 +91,9 @@ dependencies {
 
     // Anko Commons
     implementation "org.jetbrains.anko:anko-commons:$ankoVersion"
-    implementation "org.jetbrains.anko:anko-design:$ankoVersion" // For SnackBars
-    
+    implementation "org.jetbrains.anko:anko-design:$ankoVersion"
+
+    // For SnackBars
     kapt "android.arch.persistence.room:compiler:$rootProject.roomVersion"
     implementation "android.arch.lifecycle:extensions:$rootProject.lifecycleVersion"
     implementation "android.arch.navigation:navigation-fragment-ktx:$rootProject.navigationVersion"
@@ -93,6 +101,7 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
     implementation "android.arch.work:work-runtime-ktx:$rootProject.workVersion"
     implementation "androidx.core:core-ktx:$rootProject.ktxVersion"
+    //noinspection GradleCompatible
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"

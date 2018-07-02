@@ -89,23 +89,36 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
         val storedUserLocation = recommendationsViewModel.currentLocation.value
                 ?: UserLocation("", "", Coordinates(0.0, 0.0))
 
-        if (shouldRequestNewLocation(storedUserLocation, preferences.getLong(LOCATION_TIMESTAMP, Long.MAX_VALUE), System.currentTimeMillis()))
+        if (shouldRequestNewLocation(storedUserLocation, preferences.getLong(LOCATION_TIMESTAMP, Long.MAX_VALUE), System.currentTimeMillis())) {
             getLatestKnownLocation()
+        }
+
+        mBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name) {
+                    val confidence = intent.getIntExtra(ActivityBroadcast.ACTIVITY_CONFIDENCE.name, 0)
+                    val type = intent.getStringExtra(ActivityBroadcast.DETECTED_ACTIVITY.name)
+                    if(confidence > 85)
+                        recommendationsViewModel.setActivity(validAcitvityBuilder(type))
+                }
+            }
+        }
+        LocalBroadcastManager.getInstance(applicationContext)
+                .registerReceiver(mBroadcastReceiver, IntentFilter(ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name))
     }
 
     override fun onStart() {
         super.onStart()
-
         //Setup Spotify
         if (SpotifyAppRemote.isSpotifyInstalled(applicationContext)) {
-            requestAuthToken()
 
             connectionParams = ConnectionParams.Builder(CLIENT_ID)
-                    .showAuthView(true)
                     .setRedirectUri(REDIRECT_URI)
+                    .showAuthView(true)
                     .build()
 
             val connectionListener = object : Connector.ConnectionListener {
+
                 override fun onConnected(spotifyAppRemote: SpotifyAppRemote) {
                     mSpotifyAppRemote = spotifyAppRemote
                 }
@@ -115,24 +128,9 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
                 }
             }
 
-            SpotifyAppRemote.CONNECTOR.connect(this, connectionParams, connectionListener)
+                SpotifyAppRemote.CONNECTOR.connect(applicationContext, connectionParams, connectionListener)
         }
-        //TODO if not spotify is installed
-        //  navController.navigate(R.id.error_fragment)
 
-        mBroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (intent.action == ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name) {
-                    val confidence = intent.getIntExtra(ActivityBroadcast.ACTIVITY_CONFIDENCE.name, 0)
-                    val type = intent.getStringExtra(ActivityBroadcast.DETECTED_ACTIVITY.name)
-                    Log.i(TAG, "received $type with confidence $confidence")
-                    if(confidence > 75)
-                        recommendationsViewModel.setActivity(validAcitvityBuilder(type))
-                }
-            }
-        }
-        LocalBroadcastManager.getInstance(applicationContext)
-                .registerReceiver(mBroadcastReceiver, IntentFilter(ActivityBroadcast.DETECTED_ACTIVITY_BROADCAST.name))
     }
 
     override fun onResume() {
@@ -181,7 +179,6 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
     override fun onSupportNavigateUp(): Boolean = findNavController(R.id.nav_host_fragment).navigateUp()
 
     override fun play(uris: List<String>) {
-        Log.i(TAG, "Songs to play ${uris.size}")
             mSpotifyAppRemote.apply {
             if (isConnected) {
                 val playerState = playerApi.playerState.await()
@@ -214,7 +211,6 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
                                 recommendationsViewModel.authToken.value!!
                             else Token(preferences.getString(TOKEN_STRING, ""), preferences.getLong(TOKEN_TIMESTAMP, Long.MAX_VALUE))
 
-
         if(shouldRequestNewToken(token, System.currentTimeMillis())) {
             val builder = AuthenticationRequest.Builder(
                                                     CLIENT_ID,
@@ -226,8 +222,6 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
         } else  {
             recommendationsViewModel.authToken.value = token
         }
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -237,7 +231,6 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
             val response = AuthenticationClient.getResponse(resultCode, intent)
             when (response.type) {
                 AuthenticationResponse.Type.TOKEN -> {
-                    Log.i(TAG, response.accessToken)
                     recommendationsViewModel.authToken.value = Token(response.accessToken, System.currentTimeMillis())
                 }
                 AuthenticationResponse.Type.ERROR -> Log.e(TAG, response.error)
@@ -245,6 +238,7 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
             }
         }
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
@@ -283,12 +277,10 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
 
                         try {
                             val service = buildGoogleApiService()
-                            val res = service.addressFromCoordinates("${it.latitude}, ${it.longitude}", "AIzaSyAjijhgnmvidgyjVXYNumXu4CH8_fPHzcc").execute()
+                            val res = service.addressFromCoordinates("${it.latitude}, ${it.longitude}", BuildConfig.GoogleAPIKEY).execute()
 
                             if(res.isSuccessful) {
-                                Log.i(TAG, "${res.body()}")
                                 val locs = res.body()!!
-                                Log.i(TAG, locs.results[1].formattedAddress)
                                 val symbolic = locs.results[1].addressComponent[0].short_name
                                 val userLoc = UserLocation(UUID.randomUUID().toString(), symbolic, Coordinates(it.longitude, it.latitude))
                                 db.locationDao().addLocation(userLoc)

@@ -1,6 +1,5 @@
 package com.kalk.jmr.ui.recommendations
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -91,8 +90,7 @@ class RecommendationsFragment : Fragment() {
             it.isEnabled = false
             playCommands.requestAuthToken()
                 val fm = fragmentManager
-                val hdf= RecommendationsDialogFragment
-                        .newInstance()
+                val hdf= RecommendationsDialogFragment.newInstance()
                 hdf.show(fm, "recommendations_dialog_fragment")
             it.isEnabled = true
         }

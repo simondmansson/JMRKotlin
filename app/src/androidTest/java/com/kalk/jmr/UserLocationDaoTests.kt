@@ -33,7 +33,7 @@ class UserLocationDaoTests {
 
     @Test
     fun location_is_added_to_database() {
-        val location = UserLocation("UUID", Coordinates(1.0, 2.0))
+        val location = UserLocation("UUID", "SymbolicLOCATION",Coordinates(1.0, 2.0))
         dao.addLocation(location)
         val queryResult = dao.byId("UUID")
         assertEquals(queryResult.id, location.id)
@@ -43,8 +43,8 @@ class UserLocationDaoTests {
 
     @Test
     fun will_not_add_location_with_same_coordinates_twice_to_db() {
-        val loc1 = UserLocation("UUID", Coordinates(1.0, 2.0))
-        val loc2 = UserLocation("UUID2", Coordinates(1.0, 2.0))
+        val loc1 = UserLocation("UUID","SymbolicLOCATION", Coordinates(1.0, 2.0))
+        val loc2 = UserLocation("UUID2", "SymbolicLOCATION", Coordinates(1.0, 2.0))
         dao.addLocation(loc1)
         dao.addLocation(loc2)
         val queryResult = dao.byId("UUID")
@@ -57,7 +57,7 @@ class UserLocationDaoTests {
 
     @Test
     fun finds_userLocation_by_coordinates() {
-        val loc1 = UserLocation("UUID", Coordinates(1.0, 2.0))
+        val loc1 = UserLocation("UUID", "SymbolicLOCATION", Coordinates(1.0, 2.0))
         dao.addLocation(loc1)
         val queryResult = dao.inRangeOfCoordinates(0.0, 0.0, 2.0, 2.0)
         assertEquals(queryResult.id, loc1.id)

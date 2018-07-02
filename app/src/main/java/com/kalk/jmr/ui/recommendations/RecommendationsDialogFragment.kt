@@ -42,6 +42,8 @@ class RecommendationsDialogFragment: DialogFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        progressBar3.visibility = View.GONE
+
 
         genreViewModel = ViewModelProviders.of(activity!!,
                 GenresViewModelFactory(
@@ -51,6 +53,8 @@ class RecommendationsDialogFragment: DialogFragment() {
         recommendationsViewModel = ViewModelProviders.of(activity!!, RecommendationsViewModelFactory(
                 getPlaylistRepository(activity!!.applicationContext)))
                 .get(RecommendationsViewModel::class.java)
+
+
 
         /**
          * SETTINGS
@@ -70,11 +74,13 @@ class RecommendationsDialogFragment: DialogFragment() {
         }
 
         button_recommend_from_genre.setOnClickListener {
+
+
             if(genreViewModel.chosenGenre.value != null && genreViewModel.genreText.value != null ) {
                 val id = genreViewModel.chosenGenre.value!!
                 val text = genreViewModel.genreText.value!!
 
-
+                progressBar3.visibility = View.VISIBLE
                 doAsync {
                     val recommendation = recommendationsViewModel.makeRecommendationFromGenre(text)
                     if(recommendation.isNotEmpty()) {
@@ -92,6 +98,7 @@ class RecommendationsDialogFragment: DialogFragment() {
 
         if (tracks.isEmpty()) button_recommend_from_history.isEnabled = false
         button_recommend_from_history.setOnClickListener {
+            progressBar3.visibility = View.VISIBLE
             doAsync {
                 if(tracks.isNotEmpty()) {
                     val recommendation = recommendationsViewModel.makeRecommendationFromHistory(tracks)
