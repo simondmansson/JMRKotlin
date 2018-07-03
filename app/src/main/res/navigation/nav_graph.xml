@@ -18,7 +18,7 @@
             app:destination="@id/settingsFragment" />
         <action
             android:id="@+id/action_recommendationsFragment_to_genresFragment"
-            app:destination="@id/genresFragment" />
+            app:destination="@id/genresFragment" app:enterAnim="@anim/nav_default_enter_anim" app:exitAnim="@anim/nav_default_exit_anim"/>
     </fragment>
 
     <fragment

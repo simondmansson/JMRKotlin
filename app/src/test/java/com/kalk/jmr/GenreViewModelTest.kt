@@ -9,7 +9,6 @@ import com.kalk.jmr.ui.genres.GenresViewModel
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -48,7 +47,7 @@ class GenreViewModelTest {
         genreViewModel = GenresViewModel(repo)
         val observer = mock<Observer<List<Genre>>>()
         val textObserver = mock<Observer<String>>()
-        genreViewModel.genres.observeForever(observer) //have to observe this as well for genreText change to trigger?
+        genreViewModel.genres.observeForever(observer) //have navigateTo observe this as well for genreText change navigateTo trigger?
         genreViewModel.genreText.observeForever(textObserver)
         genreViewModel.chosenGenre.value = 1
         assertEquals("Pop", genreViewModel.genreText.value) //Big P since we capitalize

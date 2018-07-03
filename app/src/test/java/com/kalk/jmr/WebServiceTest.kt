@@ -12,7 +12,7 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * Test for checking conversion of response body to correct pojo
+ * Test for checking conversion of response body navigateTo correct pojo
  */
 class WebServiceTest {
 

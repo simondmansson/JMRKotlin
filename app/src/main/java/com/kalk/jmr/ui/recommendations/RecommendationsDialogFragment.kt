@@ -7,10 +7,7 @@ import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.kalk.jmr.R
-import com.kalk.jmr.SpotifyCommands
-import com.kalk.jmr.getGenreRepository
-import com.kalk.jmr.getPlaylistRepository
+import com.kalk.jmr.*
 import com.kalk.jmr.ui.genres.GenresViewModel
 import com.kalk.jmr.ui.genres.GenresViewModelFactory
 import com.kalk.jmr.ui.settings.SettingsViewModel
@@ -21,6 +18,7 @@ import org.jetbrains.anko.toast
 
 class RecommendationsDialogFragment: DialogFragment() {
     private lateinit var playCommands: SpotifyCommands
+    private lateinit var navigate: NavigationHelper
     private lateinit var genreViewModel: GenresViewModel
     private lateinit var recommendationsViewModel: RecommendationsViewModel
     private lateinit var settings: SettingsViewModel
@@ -34,6 +32,7 @@ class RecommendationsDialogFragment: DialogFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         playCommands = context as SpotifyCommands
+        navigate = context as NavigationHelper
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -92,6 +91,7 @@ class RecommendationsDialogFragment: DialogFragment() {
                 }
             } else {
                 context?.toast("Please choose a genre")
+                navigate.navigateTo(R.id.genresFragment)
                 dismiss()
             }
         }

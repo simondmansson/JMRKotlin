@@ -45,7 +45,8 @@ import java.util.*
 
 
 @SuppressLint("MissingPermission")
-class MainActivity : AppCompatActivity(), SpotifyCommands {
+class MainActivity : AppCompatActivity(), SpotifyCommands, NavigationHelper {
+
 
     private lateinit var navController: NavController
     private lateinit var mSpotifyAppRemote: SpotifyAppRemote
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
                         getPlaylistRepository(applicationContext)))
                 .get(RecommendationsViewModel::class.java)
 
-        recommendationsViewModel.setActivity(validAcitvityBuilder(ValidActivity.STILL.title)) //setActiviy to still on startup
+        recommendationsViewModel.setActivity(validAcitvityBuilder(ValidActivity.STILL.title)) //setActiviy navigateTo still on startup
 
         with(settings) {
             activity.value = preferences.getBoolean(SWITCH_ACTIVITY, true)
@@ -170,8 +171,8 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.settingsFragment -> navController.navigate(R.id.settingsFragment)
-            R.id.aboutFragment -> navController.navigate(R.id.aboutFragment)
+            R.id.settingsFragment -> navigateTo(R.id.settingsFragment)
+            R.id.aboutFragment -> navigateTo(R.id.aboutFragment)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -248,6 +249,10 @@ class MainActivity : AppCompatActivity(), SpotifyCommands {
                 return
             }
         }
+    }
+
+    override fun navigateTo(fragment: Int) {
+        navController.navigate(fragment)
     }
 
     //thanks google

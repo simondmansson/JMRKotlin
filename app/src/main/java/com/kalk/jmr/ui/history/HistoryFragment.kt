@@ -37,6 +37,7 @@ class HistoryFragment : Fragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         playCommands = context as SpotifyCommands
+        playCommands.requestAuthToken()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-// Create a variable called keystorePropertiesFile, and initialize it to your
+// Create a variable called keystorePropertiesFile, and initialize it navigateTo your
 // keystore.properties file, in the rootProject folder.
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 
@@ -32,8 +32,8 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 4
+        versionName "1.0.3"
         vectorDrawables.useSupportLibrary true
         signingConfig signingConfigs.config
     }
