@@ -68,6 +68,15 @@ class MainActivity : AppCompatActivity(), SpotifyCommands, NavigationHelper {
         bottom_nav.setupWithNavController(navController)
 
         preferences = getSharedPreferences("com.kalk.jmr.sharedPreferences", Context.MODE_PRIVATE)
+
+        if(preferences.getBoolean(FIRST_TIME_STARTUP, true)) {
+            with(preferences.edit()) {
+                putBoolean(FIRST_TIME_STARTUP, false)
+                apply()
+            }
+            navigateTo(R.id.aboutFragment)
+        }
+
         settings = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
 
         recommendationsViewModel = ViewModelProviders.of(this,
