@@ -61,7 +61,10 @@ class RecommendationsDialogFragment: DialogFragment() {
         settings = ViewModelProviders.of(activity!!).get(SettingsViewModel::class.java)
 
         button_recommend_from_history.isEnabled = false
-        doAsync {
+
+        number_of_tracks.text = resources.getString(R.string.found_with_current_context, 0)
+
+                doAsync {
             //Settings values can never be null as the are always set when main activity is created.
             tracks = recommendationsViewModel.tracksConnectedToContext(
                     checkForActivity = settings.activity.value!!,

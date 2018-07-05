@@ -48,8 +48,8 @@
 
     <android.support.design.button.MaterialButton
         android:id="@+id/button_recommend_from_history"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_width="240dp"
+        android:layout_height="63dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="28dp"
@@ -62,7 +62,7 @@
         android:id="@+id/progressBar3"
         style="?android:attr/progressBarStyle"
         android:layout_width="271dp"
-        android:layout_height="184dp"
+        android:layout_height="217dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
