@@ -42,6 +42,7 @@ android {
 
         buildTypes.each {
             it.buildConfigField 'String', 'GoogleAPIKEY', GoogleAPIKey
+            it.buildConfigField 'String', "SpotifyClientId", SpotifyClientId
         }
 
         debug {

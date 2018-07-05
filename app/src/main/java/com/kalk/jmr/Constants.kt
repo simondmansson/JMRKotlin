@@ -1,6 +1,6 @@
 package com.kalk.jmr
 
-const val CLIENT_ID = "b846f536be0747dbb3b7a8a10946c4be"
+const val CLIENT_ID = BuildConfig.SpotifyClientId
 const val REDIRECT_URI = "jmr://spotify/callback"
 const val FIRST_TIME_STARTUP = "FIRST_TIME_STARTUP"
 const val SWITCH_ACTIVITY = "SWITCH_ACTIVITY"
