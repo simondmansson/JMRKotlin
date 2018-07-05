@@ -26,5 +26,8 @@
     <string name="about">About</string>
     <string name="how_this_app_works">How this app works:</string>
     <string name="choose_a_genre">Choose a genre</string>
+    <string name="this_application_is_part_of_a_thesis_work_by_victor_marante_and_simon_m_nsson">This Application is part of a thesis work by Victor Marante and Simon Månsson. \nPlease fill out the form below after using the application for two weeks. </string>
+    <string name="survey_link">https://goo.gl/forms/lfHWGwZGcba43Yok1</string>
+    <string name="instructions">1. Select a genre and press the generate recommendation button, this will fetch a number of song from Spotify and then queue them on your account. You may review the list in the history tab. These tracks will be stored with information about your current context.  \n2. With tracks stored in the app you will have the option of getting a recommendation based on the tracks that you\'ve listend to previously in a similar context \n3. In the settings tab you may select if activity, location or time should be a part of recommendations. \nNo information about your context leaves the application.  Activity may be one of the following: in vehicle, on bicycle, on foot, walking, running or still.  Location is represented by gps coordinates.  Time is represented as whole hours.</string>
 
 </resources>

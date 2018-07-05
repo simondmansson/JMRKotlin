@@ -25,8 +25,7 @@ fun validAcitvityBuilder(validActivity: String): UserActivity {
         ValidActivity.ON_FOOT.name -> return UserActivity(ValidActivity.ON_FOOT.id, ValidActivity.ON_FOOT.title)
         ValidActivity.WALKING.name -> return UserActivity(ValidActivity.WALKING.id, ValidActivity.WALKING.title)
         ValidActivity.RUNNING.name-> return UserActivity(ValidActivity.RUNNING.id, ValidActivity.RUNNING.title)
-        ValidActivity.STILL.name -> return UserActivity(ValidActivity.STILL.id, ValidActivity.STILL.title)
-        else -> return UserActivity(ValidActivity.UNKNOWN.id, ValidActivity.UNKNOWN.title)
+        else -> return UserActivity(ValidActivity.STILL.id, ValidActivity.STILL.title)
     }
 }
 
